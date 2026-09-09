@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acesso CEPAN - Solicitação de Veículo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 32px 16px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-projeto {
+      text-align: center;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    .header-projeto .badge-projeto {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background-color: #dbeafe;
+      color: #1d4ed8;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      margin-bottom: 8px;
+    }
+
+    .header-projeto h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .header-projeto p {
+      font-size: 0.88rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: #ffffff;
+      width: 100%;
+      padding: 28px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      border: 1px solid #e2e8f0;
+    }
+
+    .card-header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 12px;
+    }
+
+    .card-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .card-header p {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .campo {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .opcional {
+      font-weight: normal;
+      color: #94a3b8;
+      font-size: 0.78rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+      background-color: #ffffff;
+      color: #0f172a;
+    }
+
+    input:focus, select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    #placa {
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-size: 1.1rem;
+    }
+
+    #campoOutraEmpresa {
+      display: none;
+      margin-top: 8px;
+      border-style: dashed;
+    }
+
+    button {
+      width: 100%;
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    button:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .info-storage {
+      display: block;
+      font-size: 0.75rem;
+      color: #16a34a;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .resultado {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 10px;
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #15803d;
+      display: none;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      .card {
+        padding: 32px 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header class="header-projeto">
+      <span class="badge-projeto">Projeto Acadêmico ADS</span>
+      <h1 id="tituloProjeto">[Nome do Projeto Aqui]</h1>
+      <p>Gestão Inteligente de Acesso e Portaria CEPAN</p>
+    </header>
+
+    <main class="card">
+      <div class="card-header">
+        <h2>Solicitar Acesso de Veículo</h2>
+        <p>Informe os dados do Uber, 99 ou táxi a caminho</p>
+      </div>
+
+      <form id="formAcesso">
+        <div class="campo">
+          <label for="empresa">Empresa</label>
+          <select id="empresa" required>
+            <option value="">Selecione sua empresa...</option>
+            <option value="Motorista PX">Motorista PX</option>
+            <option value="Domo">Domo</option>
+            <option value="Avell">Avell</option>
+            <option value="OUTRA">Outra empresa (digitar nome)</option>
+          </select>
+          
+          <input 
+            type="text" 
+            id="campoOutraEmpresa" 
+            placeholder="Digite o nome da empresa" 
+          />
+        </div>
+
+        <div class="campo">
+          <label for="colaborador">Seu Nome</label>
+          <input type="text" id="colaborador" placeholder="Ex: Seu Nome" required />
+          <span class="info-storage" id="avisoSalvo" style="display: none;">✓ Dados salvos automaticamente</span>
+        </div>
+
+        <div class="campo">
+          <label for="placa">Placa do Veículo</label>
+          <input type="text" id="placa" placeholder="Ex: ABC1D23" maxlength="7" required />
+        </div>
+
+        <div class="campo">
+          <label for="veiculo">Modelo / Cor <span class="opcional">(Opcional)</span></label>
+          <input type="text" id="veiculo" placeholder="Ex: Onix Prata" />
+        </div>
+
+        <div class="campo">
+          <label for="tempo">Previsão no app (Uber / 99 / Táxi)</label>
+          <select id="tempo" required>
+            <option value="3">Chega em ~3 minutos</option>
+            <option value="5" selected>Chega em ~5 minutos</option>
+            <option value="10">Chega em ~10 minutos</option>
+            <option value="15">Chega em ~15 minutos</option>
+            <option value="20">Chega em ~20 minutos</option>
+          </select>
+        </div>
+
+        <button type="submit" id="btnEnviar">Avisar Portaria</button>
+      </form>
+
+      <div id="mensagemSucesso" class="resultado"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Suas credenciais do Firebase configuradas
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsO89sOJP9xoQH0-b4Lyf2D_E9ku_JKc0",
+      authDomain: "cepan-acesso.firebaseapp.com",
+      projectId: "cepan-acesso",
+      storageBucket: "cepan-acesso.firebasestorage.app",
+      messagingSenderId: "179404408385",
+      appId: "1:179404408385:web:6afff01f3b82ca6f2668c0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById('formAcesso');
+    const selectEmpresa = document.getElementById('empresa');
+    const inputOutraEmpresa = document.getElementById('campoOutraEmpresa');
+    const inputColaborador = document.getElementById('colaborador');
+    const inputPlaca = document.getElementById('placa');
+    const inputVeiculo = document.getElementById('veiculo');
+    const selectTempo = document.getElementById('tempo');
+    const resultado = document.getElementById('mensagemSucesso');
+    const avisoSalvo = document.getElementById('avisoSalvo');
+    const btnEnviar = document.getElementById('btnEnviar');
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const nomeSalvo = localStorage.getItem('cepan_colaborador');
+      const empresaSalva = localStorage.getItem('cepan_empresa');
+
+      if (nomeSalvo) {
+        inputColaborador.value = nomeSalvo;
+        avisoSalvo.style.display = 'block';
+      }
+
+      if (empresaSalva) {
+        let existe = false;
+        for (let opt of selectEmpresa.options) {
+          if (opt.value === empresaSalva) {
+            selectEmpresa.value = empresaSalva;
+            existe = true;
+            break;
+          }
+        }
+        if (!existe) {
+          selectEmpresa.value = 'OUTRA';
+          inputOutraEmpresa.style.display = 'block';
+          inputOutraEmpresa.value = empresaSalva;
+        }
+      }
+    });
+
+    selectEmpresa.addEventListener('change', () => {
+      if (selectEmpresa.value === 'OUTRA') {
+        inputOutraEmpresa.style.display = 'block';
+        inputOutraEmpresa.required = true;
+        inputOutraEmpresa.focus();
+      } else {
+        inputOutraEmpresa.style.display = 'none';
+        inputOutraEmpresa.required = false;
+      }
+    });
+
+    form.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      btnEnviar.disabled = true;
+      btnEnviar.innerText = "Registrando na portaria...";
+
+      let empresaFinal = selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa.value.trim() : selectEmpresa.value;
+      const colaborador = inputColaborador.value.trim();
+      const placa = inputPlaca.value.trim().toUpperCase();
+      const veiculo = inputVeiculo.value.trim() || 'Não especificado';
+      const minutos = parseInt(selectTempo.value);
+
+      localStorage.setItem('cepan_colaborador', colaborador);
+      localStorage.setItem('cepan_empresa', empresaFinal);
+      avisoSalvo.style.display = 'block';
+
+      const previsaoData = new Date(Date.now() + minutos * 60000);
+      const horaFormatada = previsaoData.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+      try {
+        await addDoc(collection(db, "solicitacoes_acesso"), {
+          empresa: empresaFinal,
+          colaborador: colaborador,
+          placa: placa,
+          veiculo: veiculo,
+          minutosEstimados: minutos,
+          horarioPrevisto: previsaoData.getTime(),
+          horarioPrevistoFormatado: horaFormatada,
+          status: "AGUARDANDO",
+          criadoEm: serverTimestamp()
+        });
+
+        resultado.style.display = 'block';
+        resultado.innerHTML = `
+          <strong>✓ Enviado para a Portaria!</strong><br>
+          🚗 <strong>Placa:</strong> ${placa} (${veiculo})<br>
+          ⏱️ <strong>Previsão de chegada:</strong> às ${horaFormatada} (~${minutos} min)
+        `;
+
+        inputPlaca.value = '';
+        inputVeiculo.value = '';
+      } catch (erro) {
+        console.error("Erro ao salvar:", erro);
+        alert("Erro ao conectar com o banco de dados. Verifique a configuração.");
+      } finally {
+        btnEnviar.disabled = false;
+        btnEnviar.innerText = "Avisar Portaria";
+      }
+    });
+  </script>
+</body>
+</html>
