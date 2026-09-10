@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portaria CEPAN - Gestão de Acesso</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #334155;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .titulo-area h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: -0.5px;
+    }
+
+    .titulo-area p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-audio {
+      background-color: #1e293b;
+      border: 1px solid #475569;
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-audio.ativo {
+      background-color: #065f46;
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    .nav-abas {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background-color: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { background-color: #334155; color: #f8fafc; }
+    .tab-btn.active { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
+
+    .fila-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .badge-contador {
+      background-color: #1e293b;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+    }
+
+    .badge-contador strong { color: #38bdf8; }
+
+    .card-veiculo {
+      background-color: #1e293b;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      border-left: 6px solid #64748b;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (min-width: 768px) {
+      .card-veiculo {
+        grid-template-columns: 150px 1fr 130px 180px;
+        align-items: center;
+      }
+    }
+
+    .urgencia-alta {
+      border-left-color: #ef4444;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, #1e293b 40%);
+    }
+
+    .urgencia-media { border-left-color: #f59e0b; }
+    .urgencia-baixa { border-left-color: #10b981; }
+
+    .placa-box {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #ffffff;
+      background-color: #0f172a;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #334155;
+    }
+
+    .info-veiculo h3 {
+      font-size: 1.05rem;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+
+    .info-veiculo p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .tag-empresa {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+    .emp-domo { background-color: #1d4ed8; color: #ffffff; }
+    .emp-avell { background-color: #c026d3; color: #ffffff; }
+    .emp-px { background-color: #d97706; color: #ffffff; }
+    .emp-outra { background-color: #475569; color: #ffffff; }
+
+    .tempo-box { text-align: left; }
+
+    @media (min-width: 768px) {
+      .tempo-box { text-align: center; }
+    }
+
+    .tempo-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .tag-chegando { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .tag-perto { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .tag-longe { background-color: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+    .hora-prevista {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .acoes-card {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-liberar {
+      flex: 1;
+      background-color: #16a34a;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-liberar:hover { background-color: #15803d; }
+
+    .btn-descartar {
+      background-color: #334155;
+      color: #f87171;
+      border: 1px solid #475569;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-descartar:hover { background-color: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+
+    .relatorio-container {
+      display: none;
+      background-color: #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #334155;
+    }
+
+    .kpis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .kpi-card h4 {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-card .val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-top: 4px;
+    }
+
+    .controles-relatorio {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .filtros-data { display: flex; gap: 8px; }
+
+    .btn-filtro {
+      background-color: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .btn-filtro.active {
+      background-color: #0284c7;
+      color: white;
+      border-color: #0284c7;
+    }
+
+    .input-busca {
+      background-color: #0f172a;
+      border: 1px solid #475569;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+      width: 100%;
+      max-width: 240px;
+    }
+
+    .input-busca:focus { border-color: #38bdf8; }
+
+    .btn-exportar {
+      background-color: #059669;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-exportar:hover { background-color: #047857; }
+
+    .tabela-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background-color: #0f172a;
+      color: #94a3b8;
+      padding: 12px 14px;
+      border-bottom: 2px solid #334155;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #334155;
+      color: #e2e8f0;
+    }
+
+    tr:hover td { background-color: rgba(51, 65, 85, 0.4); }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .status-liberado { background-color: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-descartado { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    .vazio {
+      text-align: center;
+      padding: 48px 16px;
+      color: #64748b;
+      background-color: #1e293b;
+      border-radius: 12px;
+      border: 1px dashed #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="titulo-area">
+        <h1>Portaria CEPAN</h1>
+        <p>Monitoramento e Relatório de Acesso</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-audio" id="btnAudioToggle" onclick="alternarAudio()">🔔 Alerta Sonoro: OFF</button>
+        <div class="badge-contador">Fila: <strong id="qtdFila">0</strong></div>
+      </div>
+    </header>
+
+    <nav class="nav-abas">
+      <button class="tab-btn active" id="tabFila" onclick="trocarAba('fila')">🚗 Fila Operacional</button>
+      <button class="tab-btn" id="tabRelatorio" onclick="trocarAba('relatorio')">📊 Relatórios e Dashboard</button>
+    </nav>
+
+    <!-- ABA 1: Fila ao Vivo -->
+    <main class="fila-container" id="secaoFila">
+      <div class="vazio">Conectando ao banco de dados...</div>
+    </main>
+
+    <!-- ABA 2: Relatórios & Indicadores -->
+    <section class="relatorio-container" id="secaoRelatorio">
+      <div class="kpis-grid">
+        <div class="kpi-card">
+          <h4>Total Acessos Liberados</h4>
+          <div class="val" id="kpiTotal">0</div>
+        </div>
+        <div class="kpi-card">
+          <h4>Empresa Top Recorrente</h4>
+          <div class="val" id="kpiEmpresaTop" style="font-size: 1.2rem; color: #f1f5f9;">-</div>
+        </div>
+        <div class="kpi-card">
+          <h4>Registros Descartados</h4>
+          <div class="val" id="kpiDescartados" style="color: #f87171;">0</div>
+        </div>
+      </div>
+
+      <div class="controles-relatorio">
+        <div class="filtros-data">
+          <button class="btn-filtro active" onclick="filtrarRelatorio('hoje', this)">Hoje</button>
+          <button class="btn-filtro" onclick="filtrarRelatorio('semana', this)">Últimos 7 dias</button>
+          <button class="btn-filtro" onclick="filtrarRelatorio('tudo', this)">Todos</button>
+        </div>
+
+        <input type="text" id="inputBusca" class="input-busca" placeholder="🔍 Buscar por placa ou nome..." oninput="renderizarTabela()" />
+
+        <button class="btn-exportar" onclick="exportarCSV()">📥 Exportar para Excel (.CSV)</button>
+      </div>
+
+      <div class="tabela-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Placa</th>
+              <th>Veículo</th>
+              <th>Solicitante</th>
+              <th>Empresa</th>
+              <th>Data/Hora</th>
+              <th>Status</th>
+              <th style="text-align: center;">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaHistoricoCorpo">
+            <tr><td colspan="7" style="text-align:center; padding: 24px;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsO89sOJP9xoQH0-b4Lyf2D_E9ku_JKc0",
+      authDomain: "cepan-acesso.firebaseapp.com",
+      projectId: "cepan-acesso",
+      storageBucket: "cepan-acesso.firebasestorage.app",
+      messagingSenderId: "179404408385",
+      appId: "1:179404408385:web:6afff01f3b82ca6f2668c0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const containerFila = document.getElementById('secaoFila');
+    const contador = document.getElementById('qtdFila');
+    const corpoTabela = document.getElementById('tabelaHistoricoCorpo');
+    const btnAudioToggle = document.getElementById('btnAudioToggle');
+
+    let historicoCompleto = [];
+    let filtroAtual = 'hoje';
+    let audioAtivo = false;
+    let quantidadeAnterior = 0;
+    let primeiraCarga = true;
+
+    function tocarBip() {
+      if (!audioAtivo) return;
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {
+        console.error("Áudio bloqueado", e);
+      }
+    }
+
+    window.alternarAudio = function() {
+      audioAtivo = !audioAtivo;
+      if (audioAtivo) {
+        btnAudioToggle.classList.add('ativo');
+        btnAudioToggle.innerText = '🔔 Alerta Sonoro: ON';
+        tocarBip();
+      } else {
+        btnAudioToggle.classList.remove('ativo');
+        btnAudioToggle.innerText = '🔔 Alerta Sonoro: OFF';
+      }
+    };
+
+    function obterClasseEmpresa(empresa) {
+      const emp = (empresa || '').toLowerCase();
+      if (emp.includes('domo')) return 'emp-domo';
+      if (emp.includes('avell')) return 'emp-avell';
+      if (emp.includes('px')) return 'emp-px';
+      return 'emp-outra';
+    }
+
+    const q = query(collection(db, "solicitacoes_acesso"), where("status", "==", "AGUARDANDO"));
+
+    onSnapshot(q, (snapshot) => {
+      let lista = [];
+      const agora = Date.now();
+
+      snapshot.forEach((documento) => {
+        const dados = documento.data();
+        const diferencaMs = dados.horarioPrevisto - agora;
+        lista.push({
+          id: documento.id,
+          ...dados,
+          minutosRestantes: Math.round(diferencaMs / 60000)
+        });
+      });
+
+      if (!primeiraCarga && lista.length > quantidadeAnterior) {
+        tocarBip();
+      }
+      primeiraCarga = false;
+      quantidadeAnterior = lista.length;
+
+      lista.sort((a, b) => a.horarioPrevisto - b.horarioPrevisto);
+      contador.innerText = lista.length;
+      containerFila.innerHTML = '';
+
+      if (lista.length === 0) {
+        containerFila.innerHTML = `
+          <div class="vazio">
+            <h3>Nenhum veículo aguardando na portaria</h3>
+            <p>Novos avisos de chegada aparecerão aqui automaticamente.</p>
+          </div>
+        `;
+        return;
+      }
+
+      lista.forEach((item) => {
+        let classeUrgencia = 'urgencia-baixa';
+        let tagTexto = `~${item.minutosRestantes} min`;
+        let classeTag = 'tag-longe';
+
+        if (item.minutosRestantes <= 2) {
+          classeUrgencia = 'urgencia-alta';
+          tagTexto = item.minutosRestantes <= 0 ? 'Chegando agora' : `~${item.minutosRestantes} min`;
+          classeTag = 'tag-chegando';
+        } else if (item.minutosRestantes <= 6) {
+          classeUrgencia = 'urgencia-media';
+          classeTag = 'tag-perto';
+        }
+
+        const classeEmpresa = obterClasseEmpresa(item.empresa);
+
+        const card = document.createElement('div');
+        card.className = `card-veiculo ${classeUrgencia}`;
+        card.innerHTML = `
+          <div class="placa-box">${item.placa}</div>
+          <div class="info-veiculo">
+            <h3>${item.veiculo}</h3>
+            <p><strong>${item.colaborador}</strong> <span class="tag-empresa ${classeEmpresa}">${item.empresa}</span></p>
+          </div>
+          <div class="tempo-box">
+            <span class="tempo-tag ${classeTag}">${tagTexto}</span>
+            <div class="hora-prevista">Previsão: ${item.horarioPrevistoFormatado}</div>
+          </div>
+          <div class="acoes-card">
+            <button class="btn-liberar" data-id="${item.id}">Liberar</button>
+            <button class="btn-descartar" title="Descartar solicitação" data-id="${item.id}">✖</button>
+          </div>
+        `;
+        containerFila.appendChild(card);
+      });
+
+      document.querySelectorAll('.btn-liberar').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const docId = e.target.getAttribute('data-id');
+          await updateDoc(doc(db, "solicitacoes_acesso", docId), {
+            status: "LIBERADO",
+            liberadoEm: new Date().toISOString()
+          });
+        });
+      });
+
+      document.querySelectorAll('.btn-descartar').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const docId = e.target.getAttribute('data-id');
+          if (confirm("Deseja descartar esta solicitação?")) {
+            await updateDoc(doc(db, "solicitacoes_acesso", docId), {
+              status: "DESCARTADO",
+              liberadoEm: new Date().toISOString()
+            });
+          }
+        });
+      });
+    });
+
+    async function carregarRelatorio() {
+      corpoTabela.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px;">Atualizando...</td></tr>`;
+      
+      try {
+        const querySnapshot = await getDocs(collection(db, "solicitacoes_acesso"));
+        historicoCompleto = [];
+
+        querySnapshot.forEach((doc) => {
+          const dados = doc.data();
+          if (dados.status === 'LIBERADO' || dados.status === 'DESCARTADO') {
+            historicoCompleto.push({ id: doc.id, ...dados });
+          }
+        });
+
+        historicoCompleto.sort((a, b) => new Date(b.liberadoEm || 0) - new Date(a.liberadoEm || 0));
+        atualizarKPIs();
+        renderizarTabela();
+      } catch (err) {
+        console.error(err);
+        corpoTabela.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding: 24px;">Erro ao carregar dados.</td></tr>`;
+      }
+    }
+
+    function atualizarKPIs() {
+      const liberados = historicoCompleto.filter(i => i.status === 'LIBERADO' && i.liberadoEm && !isNaN(new Date(i.liberadoEm)));
+      const descartados = historicoCompleto.filter(i => i.status === 'DESCARTADO' && i.liberadoEm && !isNaN(new Date(i.liberadoEm)));
+
+      document.getElementById('kpiTotal').innerText = liberados.length;
+      document.getElementById('kpiDescartados').innerText = descartados.length;
+
+      const contagemEmpresas = {};
+      liberados.forEach(i => {
+        contagemEmpresas[i.empresa] = (contagemEmpresas[i.empresa] || 0) + 1;
+      });
+
+      let topEmpresa = '-';
+      let maxAcessos = 0;
+      for (const [emp, total] of Object.entries(contagemEmpresas)) {
+        if (total > maxAcessos) {
+          maxAcessos = total;
+          topEmpresa = `${emp} (${total})`;
+        }
+      }
+      document.getElementById('kpiEmpresaTop').innerText = topEmpresa;
+    }
+
+    window.renderizarTabela = function() {
+      const agora = new Date();
+      const termoBusca = document.getElementById('inputBusca').value.toLowerCase().trim();
+
+      let filtrados = historicoCompleto.filter(item => {
+        if (!item.liberadoEm || isNaN(new Date(item.liberadoEm).getTime())) {
+          return false;
+        }
+
+        const dataItem = new Date(item.liberadoEm);
+
+        let passaData = true;
+        if (filtroAtual === 'hoje') {
+          passaData = dataItem.toDateString() === agora.toDateString();
+        } else if (filtroAtual === 'semana') {
+          const seteDiasAtras = new Date();
+          seteDiasAtras.setDate(agora.getDate() - 7);
+          passaData = dataItem >= seteDiasAtras;
+        }
+
+        let passaBusca = true;
+        if (termoBusca) {
+          passaBusca = (item.placa || '').toLowerCase().includes(termoBusca) ||
+                       (item.colaborador || '').toLowerCase().includes(termoBusca) ||
+                       (item.empresa || '').toLowerCase().includes(termoBusca);
+        }
+
+        return passaData && passaBusca;
+      });
+
+      if (filtrados.length === 0) {
+        corpoTabela.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color:#94a3b8;">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+
+      corpoTabela.innerHTML = '';
+      filtrados.forEach(item => {
+        const dataFormatada = new Date(item.liberadoEm).toLocaleString('pt-BR');
+        const isLiberado = item.status === 'LIBERADO';
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.placa}</strong></td>
+          <td>${item.veiculo}</td>
+          <td>${item.colaborador}</td>
+          <td>${item.empresa}</td>
+          <td>${dataFormatada}</td>
+          <td><span class="badge-status ${isLiberado ? 'status-liberado' : 'status-descartado'}">${item.status}</span></td>
+          <td style="text-align: center;">
+            <button class="btn-descartar" style="padding: 4px 8px; font-size: 0.75rem;" onclick="excluirRegistro('${item.id}', '${item.placa}')">
+              🗑️ Excluir
+            </button>
+          </td>
+        `;
+        corpoTabela.appendChild(tr);
+      });
+    };
+
+    window.excluirRegistro = async function(docId, placa) {
+      if (confirm(`Remover permanentemente o registro da placa ${placa} do relatório?`)) {
+        try {
+          await deleteDoc(doc(db, "solicitacoes_acesso", docId));
+          carregarRelatorio();
+        } catch (erro) {
+          console.error("Erro ao apagar registro:", erro);
+          alert("Erro ao excluir o registro do banco de dados.");
+        }
+      }
+    };
+
+    window.trocarAba = function(aba) {
+      if (aba === 'fila') {
+        document.getElementById('tabFila').classList.add('active');
+        document.getElementById('tabRelatorio').classList.remove('active');
+        document.getElementById('secaoFila').style.display = 'flex';
+        document.getElementById('secaoRelatorio').style.display = 'none';
+      } else {
+        document.getElementById('tabRelatorio').classList.add('active');
+        document.getElementById('tabFila').classList.remove('active');
+        document.getElementById('secaoFila').style.display = 'none';
+        document.getElementById('secaoRelatorio').style.display = 'block';
+        carregarRelatorio();
+      }
+    };
+
+    window.filtrarRelatorio = function(tipo, elemento) {
+      filtroAtual = tipo;
+      document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+      elemento.classList.add('active');
+      renderizarTabela();
+    };
+
+    window.exportarCSV = function() {
+      if (historicoCompleto.length === 0) {
+        alert("Sem dados para exportar.");
+        return;
+      }
+
+      let csv = "Placa;Veiculo;Solicitante;Empresa;Data e Hora;Status\n";
+      historicoCompleto.forEach(r => {
+        if (r.liberadoEm && !isNaN(new Date(r.liberadoEm))) {
+          const dataHora = new Date(r.liberadoEm).toLocaleString('pt-BR');
+          csv += `"${r.placa}";"${r.veiculo}";"${r.colaborador}";"${r.empresa}";"${dataHora}";"${r.status}"\n`;
+        }
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio_cepan_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+  </script>
+</body>
+</html>
