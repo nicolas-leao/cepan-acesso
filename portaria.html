@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portaria CEPAN - Gestão de Acesso</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #334155;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .titulo-area h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: -0.5px;
+    }
+
+    .titulo-area p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    /* Navegação por Abas */
+    .nav-abas {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background-color: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      background-color: #334155;
+      color: #f8fafc;
+    }
+
+    .tab-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+
+    /* Seção da Fila */
+    .fila-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .badge-contador {
+      background-color: #1e293b;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+    }
+
+    .badge-contador strong {
+      color: #38bdf8;
+    }
+
+    .card-veiculo {
+      background-color: #1e293b;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      border-left: 6px solid #64748b;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (min-width: 768px) {
+      .card-veiculo {
+        grid-template-columns: 160px 1fr 140px 130px;
+        align-items: center;
+      }
+    }
+
+    .urgencia-alta {
+      border-left-color: #ef4444;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, #1e293b 40%);
+    }
+
+    .urgencia-media {
+      border-left-color: #f59e0b;
+    }
+
+    .urgencia-baixa {
+      border-left-color: #10b981;
+    }
+
+    .placa-box {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #ffffff;
+      background-color: #0f172a;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #334155;
+    }
+
+    .info-veiculo h3 {
+      font-size: 1.05rem;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+
+    .info-veiculo p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .tempo-box {
+      text-align: left;
+    }
+
+    @media (min-width: 768px) {
+      .tempo-box {
+        text-align: center;
+      }
+    }
+
+    .tempo-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .tag-chegando {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    .tag-perto {
+      background-color: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+    }
+
+    .tag-longe {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .hora-prevista {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .btn-liberar {
+      background-color: #16a34a;
+      color: #ffffff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-liberar:hover {
+      background-color: #15803d;
+    }
+
+    /* Seção de Relatórios */
+    .relatorio-container {
+      display: none;
+      background-color: #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #334155;
+    }
+
+    .controles-relatorio {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .filtros-data {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-filtro {
+      background-color: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .btn-filtro.active {
+      background-color: #0284c7;
+      color: white;
+      border-color: #0284c7;
+    }
+
+    .btn-exportar {
+      background-color: #059669;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-exportar:hover {
+      background-color: #047857;
+    }
+
+    /* Tabela do Histórico */
+    .tabela-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background-color: #0f172a;
+      color: #94a3b8;
+      padding: 12px 14px;
+      border-bottom: 2px solid #334155;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #334155;
+      color: #e2e8f0;
+    }
+
+    tr:hover td {
+      background-color: rgba(51, 65, 85, 0.4);
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .vazio {
+      text-align: center;
+      padding: 48px 16px;
+      color: #64748b;
+      background-color: #1e293b;
+      border-radius: 12px;
+      border: 1px dashed #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="titulo-area">
+        <h1>Portaria CEPAN</h1>
+        <p>Monitoramento e Relatório de Acesso</p>
+      </div>
+      <div class="stats" id="areaContadorFila">
+        <div class="badge-contador">Aguardando na cancela: <strong id="qtdFila">0</strong></div>
+      </div>
+    </header>
+
+    <!-- Abas de Navegação -->
+    <nav class="nav-abas">
+      <button class="tab-btn active" id="tabFila" onclick="trocarAba('fila')">🚗 Fila Operacional</button>
+      <button class="tab-btn" id="tabRelatorio" onclick="trocarAba('relatorio')">📊 Relatórios e Histórico</button>
+    </nav>
+
+    <!-- ABA 1: Fila ao Vivo -->
+    <main class="fila-container" id="secaoFila">
+      <div class="vazio">Conectando ao banco de dados...</div>
+    </main>
+
+    <!-- ABA 2: Relatórios & Histórico -->
+    <section class="relatorio-container" id="secaoRelatorio">
+      <div class="controles-relatorio">
+        <div class="filtros-data">
+          <button class="btn-filtro active" onclick="filtrarRelatorio('hoje', this)">Hoje</button>
+          <button class="btn-filtro" onclick="filtrarRelatorio('semana', this)">Últimos 7 dias</button>
+          <button class="btn-filtro" onclick="filtrarRelatorio('tudo', this)">Todos</button>
+        </div>
+        <button class="btn-exportar" onclick="exportarCSV()">📥 Exportar para Excel (.CSV)</button>
+      </div>
+
+      <div class="tabela-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Placa</th>
+              <th>Veículo</th>
+              <th>Solicitante</th>
+              <th>Empresa</th>
+              <th>Data/Hora Entrada</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaHistoricoCorpo">
+            <tr>
+              <td colspan="6" style="text-align:center; padding: 24px;">Carregando histórico...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsO89sOJP9xoQH0-b4Lyf2D_E9ku_JKc0",
+      authDomain: "cepan-acesso.firebaseapp.com",
+      projectId: "cepan-acesso",
+      storageBucket: "cepan-acesso.firebasestorage.app",
+      messagingSenderId: "179404408385",
+      appId: "1:179404408385:web:6afff01f3b82ca6f2668c0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const containerFila = document.getElementById('secaoFila');
+    const contador = document.getElementById('qtdFila');
+    const corpoTabela = document.getElementById('tabelaHistoricoCorpo');
+
+    let historicoCompleto = [];
+    let filtroAtual = 'hoje';
+
+    // 1. Escuta Fila em Tempo Real (Status AGUARDANDO)
+    const q = query(
+      collection(db, "solicitacoes_acesso"), 
+      where("status", "==", "AGUARDANDO")
+    );
+
+    onSnapshot(q, (snapshot) => {
+      let lista = [];
+      const agora = Date.now();
+
+      snapshot.forEach((documento) => {
+        const dados = documento.data();
+        const diferencaMs = dados.horarioPrevisto - agora;
+        const minutosRestantes = Math.round(diferencaMs / 60000);
+
+        lista.push({
+          id: documento.id,
+          ...dados,
+          minutosRestantes: minutosRestantes
+        });
+      });
+
+      lista.sort((a, b) => a.horarioPrevisto - b.horarioPrevisto);
+      contador.innerText = lista.length;
+      containerFila.innerHTML = '';
+
+      if (lista.length === 0) {
+        containerFila.innerHTML = `
+          <div class="vazio">
+            <h3>Nenhum veículo aguardando na portaria</h3>
+            <p>Novos avisos de chegada aparecerão aqui automaticamente.</p>
+          </div>
+        `;
+        return;
+      }
+
+      lista.forEach((item) => {
+        let classeUrgencia = 'urgencia-baixa';
+        let tagTexto = `~${item.minutosRestantes} min`;
+        let classeTag = 'tag-longe';
+
+        if (item.minutosRestantes <= 2) {
+          classeUrgencia = 'urgencia-alta';
+          tagTexto = item.minutosRestantes <= 0 ? 'Chegando agora' : `~${item.minutosRestantes} min`;
+          classeTag = 'tag-chegando';
+        } else if (item.minutosRestantes <= 6) {
+          classeUrgencia = 'urgencia-media';
+          tagTexto = `~${item.minutosRestantes} min`;
+          classeTag = 'tag-perto';
+        }
+
+        const card = document.createElement('div');
+        card.className = `card-veiculo ${classeUrgencia}`;
+        card.innerHTML = `
+          <div class="placa-box">${item.placa}</div>
+          <div class="info-veiculo">
+            <h3>${item.veiculo}</h3>
+            <p><strong>${item.colaborador}</strong> • ${item.empresa}</p>
+          </div>
+          <div class="tempo-box">
+            <span class="tempo-tag ${classeTag}">${tagTexto}</span>
+            <div class="hora-prevista">Previsão: ${item.horarioPrevistoFormatado}</div>
+          </div>
+          <button class="btn-liberar" data-id="${item.id}">Liberar Entrada</button>
+        `;
+        containerFila.appendChild(card);
+      });
+
+      document.querySelectorAll('.btn-liberar').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const docId = e.target.getAttribute('data-id');
+          e.target.disabled = true;
+          e.target.innerText = "Liberando...";
+          
+          await updateDoc(doc(db, "solicitacoes_acesso", docId), {
+            status: "LIBERADO",
+            liberadoEm: new Date().toISOString()
+          });
+        });
+      });
+    });
+
+    // 2. Carregar Histórico e Relatórios
+    async function carregarRelatorio() {
+      corpoTabela.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px;">Atualizando dados...</td></tr>`;
+      
+      try {
+        const qHistorico = query(
+          collection(db, "solicitacoes_acesso"),
+          where("status", "==", "LIBERADO")
+        );
+
+        const querySnapshot = await getDocs(qHistorico);
+        historicoCompleto = [];
+
+        querySnapshot.forEach((doc) => {
+          historicoCompleto.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Ordena do mais recente liberado para o mais antigo
+        historicoCompleto.sort((a, b) => new Date(b.liberadoEm || 0) - new Date(a.liberadoEm || 0));
+
+        renderizarTabela();
+      } catch (err) {
+        console.error("Erro ao puxar relatório:", err);
+        corpoTabela.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444; padding: 24px;">Erro ao carregar dados.</td></tr>`;
+      }
+    }
+
+    function renderizarTabela() {
+      const agora = new Date();
+      let filtrados = historicoCompleto.filter(item => {
+        if (!item.liberadoEm) return false;
+        const dataItem = new Date(item.liberadoEm);
+
+        if (filtroAtual === 'hoje') {
+          return dataItem.toDateString() === agora.toDateString();
+        } else if (filtroAtual === 'semana') {
+          const seteDiasAtras = new Date();
+          seteDiasAtras.setDate(agora.getDate() - 7);
+          return dataItem >= seteDiasAtras;
+        }
+        return true; // 'tudo'
+      });
+
+      if (filtrados.length === 0) {
+        corpoTabela.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color:#94a3b8;">Nenhum registro encontrado para este período.</td></tr>`;
+        return;
+      }
+
+      corpoTabela.innerHTML = '';
+      filtrados.forEach(item => {
+        const dataFormatada = item.liberadoEm ? new Date(item.liberadoEm).toLocaleString('pt-BR') : 'Horário N/D';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.placa}</strong></td>
+          <td>${item.veiculo}</td>
+          <td>${item.colaborador}</td>
+          <td>${item.empresa}</td>
+          <td>${dataFormatada}</td>
+          <td><span class="badge-status">LIBERADO</span></td>
+        `;
+        corpoTabela.appendChild(tr);
+      });
+    }
+
+    // Funções exportadas para o escopo global (botões onclick)
+    window.trocarAba = function(aba) {
+      const tabFila = document.getElementById('tabFila');
+      const tabRelatorio = document.getElementById('tabRelatorio');
+      const secaoFila = document.getElementById('secaoFila');
+      const secaoRelatorio = document.getElementById('secaoRelatorio');
+
+      if (aba === 'fila') {
+        tabFila.classList.add('active');
+        tabRelatorio.classList.remove('active');
+        secaoFila.style.display = 'flex';
+        secaoRelatorio.style.display = 'none';
+      } else {
+        tabRelatorio.classList.add('active');
+        tabFila.classList.remove('active');
+        secaoFila.style.display = 'none';
+        secaoRelatorio.style.display = 'block';
+        carregarRelatorio();
+      }
+    };
+
+    window.filtrarRelatorio = function(tipo, elemento) {
+      filtroAtual = tipo;
+      document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+      elemento.classList.add('active');
+      renderizarTabela();
+    };
+
+    window.exportarCSV = function() {
+      if (historicoCompleto.length === 0) {
+        alert("Não há dados liberados para exportar no momento.");
+        return;
+      }
+
+      let csv = "Placa;Veiculo;Solicitante;Empresa;Data e Hora Liberacao;Status\n";
+      historicoCompleto.forEach(r => {
+        const dataHora = r.liberadoEm ? new Date(r.liberadoEm).toLocaleString('pt-BR') : '';
+        csv += `"${r.placa}";"${r.veiculo}";"${r.colaborador}";"${r.empresa}";"${dataHora}";"${r.status}"\n`;
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio_acessos_cepan_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+  </script>
+</body>
+</html>
