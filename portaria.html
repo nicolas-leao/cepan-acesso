@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portaria CEPAN - Painel de Controle</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Modal de PIN / Autenticação -->
+  <div id="modalPin" style="position: fixed; top:0; left:0; width:100vw; height:100vh; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999;">
+    <div style="background: #1e293b; padding: 32px; border-radius: 12px; border: 1px solid #334155; text-align: center; width: 100%; max-width: 360px;">
+      <h2 style="color: #38bdf8; margin-bottom: 8px;">Acesso Restrito</h2>
+      <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">Digite o PIN de segurança da Portaria:</p>
+      
+      <input type="password" id="inputPin" class="input-busca" maxlength="6" style="max-width: 100%; width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 4px; margin-bottom: 16px;" placeholder="••••" autofocus />
+      
+      <button id="btnEntrarPin" class="btn-exportar" style="width: 100%; padding: 10px;">Acessar Painel</button>
+      <p id="erroPin" style="color: #f87171; font-size: 0.8rem; margin-top: 12px; display: none;">PIN incorreto. Tente novamente.</p>
+    </div>
+  </div>
+
+  <!-- Conteúdo do Painel (Oculto até validação do PIN) -->
+  <div class="container" id="conteudoPainel" style="display: none;">
+    <header>
+      <div class="titulo-area">
+        <h1>Portaria CEPAN</h1>
+        <p>Monitoramento e Relatório de Acesso</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-audio" id="btnAudioToggle">🔔 Alerta Sonoro: OFF</button>
+        <button class="btn-descartar" id="btnSairPortaria" style="padding: 6px 12px; font-size: 0.8rem;">🔒 Sair</button>
+        <div class="badge-contador">Fila: <strong id="qtdFila">0</strong></div>
+      </div>
+    </header>
+
+    <nav class="nav-abas">
+      <button class="tab-btn active" id="tabFila">🚗 Fila Operacional</button>
+      <button class="tab-btn" id="tabRelatorio">📊 Relatórios e Dashboard</button>
+    </nav>
+
+    <!-- ABA 1: Fila ao Vivo -->
+    <main class="fila-container" id="secaoFila">
+      <div class="vazio">Conectando ao banco de dados...</div>
+    </main>
+
+    <!-- ABA 2: Relatórios & Indicadores -->
+    <section class="relatorio-container" id="secaoRelatorio">
+      <div class="kpis-grid">
+        <div class="kpi-card">
+          <h4>Total Acessos Liberados</h4>
+          <div class="val" id="kpiTotal">0</div>
+        </div>
+        <div class="kpi-card">
+          <h4>Empresa Top Recorrente</h4>
+          <div class="val" id="kpiEmpresaTop" style="font-size: 1.2rem; color: #f1f5f9;">-</div>
+        </div>
+        <div class="kpi-card">
+          <h4>Registros Descartados</h4>
+          <div class="val" id="kpiDescartados" style="color: #f87171;">0</div>
+        </div>
+      </div>
+
+      <div class="controles-relatorio">
+        <div class="filtros-data">
+          <button class="btn-filtro active" data-filtro="hoje">Hoje</button>
+          <button class="btn-filtro" data-filtro="semana">Últimos 7 dias</button>
+          <button class="btn-filtro" data-filtro="tudo">Todos</button>
+        </div>
+
+        <input type="text" id="inputBusca" class="input-busca" placeholder="🔍 Buscar por placa ou nome..." />
+
+        <button class="btn-exportar" id="btnExportar">📥 Exportar para Excel (.CSV)</button>
+      </div>
+
+      <div class="tabela-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Placa</th>
+              <th>Veículo</th>
+              <th>Solicitante</th>
+              <th>Empresa</th>
+              <th>Data/Hora</th>
+              <th>Status</th>
+              <th style="text-align: center;">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaHistoricoCorpo">
+            <tr><td colspan="7" style="text-align:center; padding: 24px;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Configuração do PIN de Acesso (Altere o PIN abaixo conforme desejar)
+    const PIN_CORRETO = "1234";
+
+    const modalPin = document.getElementById('modalPin');
+    const conteudoPainel = document.getElementById('conteudoPainel');
+    const inputPin = document.getElementById('inputPin');
+    const btnEntrarPin = document.getElementById('btnEntrarPin');
+    const erroPin = document.getElementById('erroPin');
+    const btnSairPortaria = document.getElementById('btnSairPortaria');
+
+    function validarPin() {
+      if (inputPin.value === PIN_CORRETO) {
+        sessionStorage.setItem('portaria_autenticada', 'true');
+        modalPin.style.display = 'none';
+        conteudoPainel.style.display = 'block';
+      } else {
+        erroPin.style.display = 'block';
+        inputPin.value = '';
+      }
+    }
+
+    // Verificar se já está autenticado nesta sessão
+    if (sessionStorage.getItem('portaria_autenticada') === 'true') {
+      modalPin.style.display = 'none';
+      conteudoPainel.style.display = 'block';
+    }
+
+    btnEntrarPin.addEventListener('click', validarPin);
+    inputPin.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') validarPin();
+    });
+
+    btnSairPortaria.addEventListener('click', () => {
+      sessionStorage.removeItem('portaria_autenticada');
+      window.location.reload();
+    });
+  </script>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
