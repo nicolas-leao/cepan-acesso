@@ -6,20 +6,16 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Porteiro = usuário com documento em porteiros/{uid}
     function ehPorteiro() {
       return logado()
         && exists(/databases/$(database)/documents/porteiros/$(request.auth.uid));
     }
 
-    // Admin = porteiro com campo admin: true no próprio documento
     function ehAdmin() {
       return ehPorteiro()
         && get(/databases/$(database)/documents/porteiros/$(request.auth.uid)).data.get('admin', false) == true;
     }
 
-    // Perfis da portaria: cada um só lê o próprio; ninguém escreve pelo cliente
-    // (crie os documentos pelo Console do Firebase, com o UID do usuário como ID)
     match /porteiros/{uid} {
       allow get: if logado() && request.auth.uid == uid;
       allow list, write: if false;
@@ -27,16 +23,17 @@ service cloud.firestore {
 
     match /solicitacoes_acesso/{id} {
 
-      // Formulário público (login anônimo): só cria, só com dados válidos
+      // Novo: Exige e valida o e-mail autenticado pelo Google
       allow create: if logado()
         && request.resource.data.keys().hasOnly([
              'empresa', 'colaborador', 'placa', 'veiculo',
-             'minutosEstimados', 'status', 'criadoEm', 'expiraEm', 'solicitanteUid'])
+             'minutosEstimados', 'status', 'criadoEm', 'expiraEm', 'solicitanteUid', 'solicitanteEmail'])
         && request.resource.data.keys().hasAll([
              'empresa', 'colaborador', 'placa', 'veiculo',
-             'minutosEstimados', 'status', 'criadoEm', 'expiraEm', 'solicitanteUid'])
+             'minutosEstimados', 'status', 'criadoEm', 'expiraEm', 'solicitanteUid', 'solicitanteEmail'])
         && request.resource.data.status == 'AGUARDANDO'
         && request.resource.data.solicitanteUid == request.auth.uid
+        && request.resource.data.solicitanteEmail == request.auth.token.email
         && request.resource.data.criadoEm == request.time
         && request.resource.data.placa is string
         && request.resource.data.placa.matches('^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$')
@@ -53,10 +50,8 @@ service cloud.firestore {
         && request.resource.data.expiraEm > request.time
         && request.resource.data.expiraEm <= request.time + duration.value(91, 'd');
 
-      // Painel da portaria
       allow read: if ehPorteiro();
 
-      // Só finaliza o que ainda está AGUARDANDO, mexendo apenas nos 3 campos esperados
       allow update: if ehPorteiro()
         && resource.data.status == 'AGUARDANDO'
         && request.resource.data.status in ['LIBERADO', 'DESCARTADO']
@@ -65,7 +60,6 @@ service cloud.firestore {
         && request.resource.data.liberadoEm == request.time
         && request.resource.data.finalizadoPor == request.auth.token.email;
 
-      // Apagar histórico só com perfil admin (preserva a auditoria da portaria)
       allow delete: if ehAdmin();
     }
   }
