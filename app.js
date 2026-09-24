@@ -1,4 +1,4 @@
-import { db, auth, COLECAO, COLECAO_PORTEIROS } from "./firebase-config.js";
+import { db, auth, COLECAO, COLECAO_PORTEIROS } from "./Firebase-config.js";
 import {
   collection, query, where, orderBy, limit, onSnapshot,
   doc, getDoc, getDocs, updateDoc, deleteDoc, serverTimestamp, Timestamp
