@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Acesso CEPAN - Solicitação de Veículo</title>
 
-  <!-- Ícone da aba do navegador e atalho de aplicativo no celular -->
   <link rel="icon" type="image/png" href="icone.png" />
   <link rel="apple-touch-icon" href="icone.png" />
 
@@ -88,6 +87,9 @@
       margin-bottom: 20px;
       border-bottom: 1px solid #f1f5f9;
       padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
     }
 
     .card-header h2 {
@@ -101,6 +103,43 @@
       color: #64748b;
       margin-top: 2px;
     }
+
+    .btn-sair {
+      background-color: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0;
+      width: auto;
+    }
+    .btn-sair:hover { background-color: #e2e8f0; color: #1e293b; }
+
+    /* Estilos Login Google */
+    .btn-google {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: #ffffff;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .btn-google:hover:not(:disabled) { background-color: #f8fafc; border-color: #94a3b8; transform: translateY(-2px); }
+    .btn-google:disabled { opacity: 0.7; cursor: not-allowed; }
 
     .box-ocr {
       display: block;
@@ -118,10 +157,6 @@
     .box-ocr:hover, .box-ocr:active, .box-ocr:focus-within {
       border-color: #2563eb;
       background-color: #eff6ff;
-    }
-
-    .box-ocr:focus-within {
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
     }
 
     .box-ocr span {
@@ -154,9 +189,7 @@
       margin-top: 8px;
       font-weight: 600;
     }
-
     .status-ocr:empty { display: none; }
-
     .status-processando { color: #2563eb; }
     .status-sucesso { color: #16a34a; }
     .status-falha { color: #dc2626; }
@@ -171,11 +204,7 @@
       margin-bottom: 6px;
     }
 
-    .opcional {
-      font-weight: normal;
-      color: #94a3b8;
-      font-size: 0.78rem;
-    }
+    .opcional { font-weight: normal; color: #94a3b8; font-size: 0.78rem; }
 
     input[type="text"], select {
       width: 100%;
@@ -189,9 +218,17 @@
       color: #0f172a;
     }
 
-    input[type="text"]:focus, select:focus {
+    input[type="text"]:focus:not(:read-only), select:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    
+    /* Input Bloqueado (Nome Puxado do Google) */
+    input:read-only {
+      background-color: #f1f5f9 !important;
+      color: #64748b !important;
+      cursor: not-allowed;
+      border-color: #e2e8f0 !important;
     }
 
     #placa {
@@ -208,13 +245,9 @@
       margin-top: 4px;
     }
 
-    #campoOutraEmpresa {
-      display: none;
-      margin-top: 8px;
-      border-style: dashed;
-    }
+    #campoOutraEmpresa { display: none; margin-top: 8px; border-style: dashed; }
 
-    button {
+    button[type="submit"] {
       width: 100%;
       background-color: #2563eb;
       color: #ffffff;
@@ -227,10 +260,8 @@
       margin-top: 8px;
       transition: background-color 0.2s ease;
     }
-
-    button:hover { background-color: #1d4ed8; }
-    button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
-    button:disabled { background-color: #94a3b8; cursor: not-allowed; }
+    button[type="submit"]:hover { background-color: #1d4ed8; }
+    button[type="submit"]:disabled { background-color: #94a3b8; cursor: not-allowed; }
 
     .info-storage {
       display: block;
@@ -250,13 +281,7 @@
       font-size: 0.88rem;
       line-height: 1.5;
     }
-
-    .resultado.erro {
-      background-color: #fef2f2;
-      border-color: #fecaca;
-      color: #b91c1c;
-    }
-
+    .resultado.erro { background-color: #fef2f2; border-color: #fecaca; color: #b91c1c; }
     .resultado:empty { display: none; }
 
     .aviso-privacidade {
@@ -267,9 +292,7 @@
       line-height: 1.4;
     }
 
-    /* =========================================
-       BOTÃO E TEMA ESCURO (DARK MODE)
-       ========================================= */
+    /* MODO ESCURO */
     .btn-tema {
       position: absolute;
       top: -10px;
@@ -288,78 +311,24 @@
       z-index: 10;
       margin-top: 0;
     }
+    .btn-tema:hover { background: #f8fafc; transform: translateY(-2px); }
 
-    .btn-tema:hover {
-      background: #f8fafc;
-      transform: translateY(-2px);
-    }
-
-    /* REGRAS DE CORES QUANDO O MODO ESCURO ESTIVER ATIVO */
-    body.tema-escuro {
-      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-      color: #f8fafc;
-    }
-
-    body.tema-escuro .btn-tema {
-      background: #1e293b;
-      color: #f8fafc;
-      border-color: #334155;
-    }
-
-    body.tema-escuro .card {
-      background: #1e293b;
-      border-color: #334155;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    }
-
-    body.tema-escuro .card-header h2,
-    body.tema-escuro label.rotulo,
-    body.tema-escuro .box-ocr span {
-      color: #f1f5f9;
-    }
-
-    body.tema-escuro .card-header p,
-    body.tema-escuro .opcional,
-    body.tema-escuro .dica-campo,
-    body.tema-escuro .box-ocr small,
-    body.tema-escuro .header-projeto p {
-      color: #94a3b8;
-    }
-
-    body.tema-escuro input[type="text"],
-    body.tema-escuro select {
-      background-color: #0f172a;
-      border-color: #475569;
-      color: #f8fafc;
-    }
-
-    body.tema-escuro .box-ocr {
-      background-color: #0f172a;
-      border-color: #475569;
-    }
-
-    /* Ajuste da Logo para destacar no fundo escuro (Fundo Branco Arredondado) */
-    body.tema-escuro .logo-cepan {
-      filter: none;
-      mix-blend-mode: normal;
-      background-color: #ffffff;
-      padding: 10px 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    }
-
-    /* Alerta de Sucesso/Erro Escuro */
-    body.tema-escuro .resultado {
-      background-color: #064e3b;
-      border-color: #059669;
-      color: #6ee7b7;
-    }
-
-    body.tema-escuro .resultado.erro {
-      background-color: #7f1d1d;
-      border-color: #b91c1c;
-      color: #fca5a5;
-    }
+    body.tema-escuro { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: #f8fafc; }
+    body.tema-escuro .btn-tema { background: #1e293b; color: #f8fafc; border-color: #334155; }
+    body.tema-escuro .card { background: #1e293b; border-color: #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+    body.tema-escuro .card-header h2, body.tema-escuro label.rotulo, body.tema-escuro .box-ocr span { color: #f1f5f9; }
+    body.tema-escuro .card-header p, body.tema-escuro .opcional, body.tema-escuro .dica-campo, body.tema-escuro .box-ocr small, body.tema-escuro .header-projeto p { color: #94a3b8; }
+    
+    body.tema-escuro input[type="text"], body.tema-escuro select { background-color: #0f172a; border-color: #475569; color: #f8fafc; }
+    body.tema-escuro input:read-only { background-color: #0f172a !important; color: #94a3b8 !important; border-color: #334155 !important; }
+    body.tema-escuro .box-ocr { background-color: #0f172a; border-color: #475569; }
+    body.tema-escuro .logo-cepan { filter: none; mix-blend-mode: normal; background-color: #ffffff; padding: 10px 20px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
+    body.tema-escuro .resultado { background-color: #064e3b; border-color: #059669; color: #6ee7b7; }
+    body.tema-escuro .resultado.erro { background-color: #7f1d1d; border-color: #b91c1c; color: #fca5a5; }
+    body.tema-escuro .btn-google { background-color: #0f172a; border-color: #475569; color: #f1f5f9; }
+    body.tema-escuro .btn-google:hover:not(:disabled) { background-color: #1e293b; }
+    body.tema-escuro .btn-sair { background-color: #0f172a; color: #94a3b8; border-color: #334155; }
+    body.tema-escuro .btn-sair:hover { background-color: #ef4444; color: #fff; border-color: #ef4444; }
 
     @media (min-width: 768px) {
       body { justify-content: center; padding: 40px 20px; }
@@ -367,94 +336,101 @@
       .logo-cepan { max-width: 270px; }
       .btn-tema { top: 0; }
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { transition: none !important; }
-    }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    
-    <!-- BOTÃO MODO ESCURO -->
     <button type="button" id="btnTema" class="btn-tema" aria-label="Alternar tema">🌙 Escuro</button>
 
     <header class="header-projeto">
-      <!-- Imagem atualizada para logo_2.png -->
       <img src="logo_2.png" alt="CEPAN" class="logo-cepan" width="800" height="236" />
       <span class="badge-projeto">Portaria Inteligente</span>
       <p>Aviso de Chegada de Veículos</p>
     </header>
 
     <main class="card">
-      <div class="card-header">
-        <h2>Solicitar Acesso de Veículo</h2>
-        <p>Preencha os dados ou anexe o print da corrida</p>
+      
+      <!-- TELA DE LOGIN (Mostrada para usuários não logados) -->
+      <div id="blocoLogin" style="text-align: center; padding: 30px 10px;">
+        <h2 style="margin-bottom: 12px; font-size: 1.25rem;">Acesso Corporativo</h2>
+        <p style="margin-bottom: 24px; font-size: 0.9rem; color: #64748b;">Faça login com sua conta corporativa para solicitar a liberação do seu veículo na portaria.</p>
+        
+        <button type="button" id="btnGoogle" class="btn-google">
+          <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+          Entrar com Google
+        </button>
       </div>
 
-      <label class="box-ocr" for="inputPrint">
-        <input type="file" id="inputPrint" accept="image/*" class="visualmente-oculto" />
-        <span>📷 Anexar print do Uber / 99</span>
-        <small>Toque para escolher o print na sua galeria</small>
-        <div id="statusOcr" class="status-ocr" role="status" aria-live="polite"></div>
-      </label>
-
-      <form id="formAcesso" novalidate>
-        <div class="campo">
-          <label class="rotulo" for="empresa">Empresa</label>
-          <select id="empresa" required>
-            <option value="">Selecione sua empresa...</option>
-            <option value="Domo Soluções">Domo Soluções</option>
-            <option value="Motorista PX">Motorista PX</option>
-            <option value="Avell">Avell</option>
-            <option value="OUTRA">Outra empresa (digitar nome)</option>
-          </select>
-
-          <input type="text" id="campoOutraEmpresa" placeholder="Digite o nome da empresa"
-                 maxlength="60" aria-label="Nome da empresa" />
+      <!-- TELA DO FORMULÁRIO (Mostrada apenas se logado) -->
+      <div id="blocoFormulario" style="display: none;">
+        <div class="card-header">
+          <div>
+            <h2>Solicitar Acesso</h2>
+            <p>Preencha os dados ou anexe o print da corrida</p>
+          </div>
+          <button type="button" id="btnSair" class="btn-sair">Sair da Conta</button>
         </div>
 
-        <div class="campo">
-          <label class="rotulo" for="colaborador">Seu Nome</label>
-          <input type="text" id="colaborador" placeholder="Ex: Seu Nome" required
-                 minlength="2" maxlength="80" autocomplete="name" />
-          <span class="info-storage" id="avisoSalvo" style="display: none;">✓ Dados salvos neste aparelho</span>
-        </div>
+        <label class="box-ocr" for="inputPrint">
+          <input type="file" id="inputPrint" accept="image/*" class="visualmente-oculto" />
+          <span>📷 Anexar print do Uber / 99</span>
+          <small>Toque para escolher o print na sua galeria</small>
+          <div id="statusOcr" class="status-ocr" role="status" aria-live="polite"></div>
+        </label>
 
-        <div class="campo">
-          <label class="rotulo" for="placa">Placa do Veículo</label>
-          <input type="text" id="placa" placeholder="Ex: ABC1D23" maxlength="7" required
-                 pattern="[A-Z]{3}[0-9][A-Z0-9][0-9]{2}" autocomplete="off" autocapitalize="characters"
-                 spellcheck="false" aria-describedby="dicaPlaca" />
-          <span class="dica-campo" id="dicaPlaca">Confira a placa no app antes de enviar.</span>
-        </div>
+        <form id="formAcesso" novalidate>
+          <div class="campo">
+            <label class="rotulo" for="colaborador">Seu Nome</label>
+            <input type="text" id="colaborador" required readonly title="Seu nome é puxado automaticamente do e-mail" />
+            <span class="info-storage" id="avisoSalvo" style="display: none;"></span>
+          </div>
 
-        <div class="campo">
-          <label class="rotulo" for="veiculo">Modelo / Cor <span class="opcional">(Opcional)</span></label>
-          <input type="text" id="veiculo" placeholder="Ex: Onix Prata" maxlength="60" />
-        </div>
+          <div class="campo">
+            <label class="rotulo" for="empresa">Empresa</label>
+            <select id="empresa" required>
+              <option value="">Selecione sua empresa...</option>
+              <option value="Domo Soluções">Domo Soluções</option>
+              <option value="Motorista PX">Motorista PX</option>
+              <option value="Avell">Avell</option>
+              <option value="OUTRA">Outra empresa (digitar nome)</option>
+            </select>
+            <input type="text" id="campoOutraEmpresa" placeholder="Digite o nome da empresa" maxlength="60" />
+          </div>
 
-        <div class="campo">
-          <label class="rotulo" for="tempo">Previsão no app (Uber / 99 / Táxi)</label>
-          <select id="tempo" required>
-            <option value="3">Chega em ~3 minutos</option>
-            <option value="5" selected>Chega em ~5 minutos</option>
-            <option value="10">Chega em ~10 minutos</option>
-            <option value="15">Chega em ~15 minutos</option>
-            <option value="20">Chega em ~20 minutos</option>
-          </select>
-        </div>
+          <div class="campo">
+            <label class="rotulo" for="placa">Placa do Veículo</label>
+            <input type="text" id="placa" placeholder="Ex: ABC1D23" maxlength="7" required
+                   pattern="[A-Z]{3}[0-9][A-Z0-9][0-9]{2}" autocomplete="off" autocapitalize="characters"
+                   spellcheck="false" aria-describedby="dicaPlaca" />
+            <span class="dica-campo" id="dicaPlaca">Confira a placa no app antes de enviar.</span>
+          </div>
 
-        <button type="submit" id="btnEnviar">Avisar Portaria</button>
-      </form>
+          <div class="campo">
+            <label class="rotulo" for="veiculo">Modelo / Cor <span class="opcional">(Opcional)</span></label>
+            <input type="text" id="veiculo" placeholder="Ex: Onix Prata" maxlength="60" />
+          </div>
 
-      <div id="mensagemResultado" class="resultado" role="status" aria-live="polite"></div>
+          <div class="campo">
+            <label class="rotulo" for="tempo">Previsão no app (Uber / 99 / Táxi)</label>
+            <select id="tempo" required>
+              <option value="3">Chega em ~3 minutos</option>
+              <option value="5" selected>Chega em ~5 minutos</option>
+              <option value="10">Chega em ~10 minutos</option>
+              <option value="15">Chega em ~15 minutos</option>
+              <option value="20">Chega em ~20 minutos</option>
+            </select>
+          </div>
 
-      <p class="aviso-privacidade">
-        Nome, empresa e placa são usados só para liberar sua entrada e ficam guardados por até 90 dias.
-        O print é lido no seu próprio aparelho e não é enviado.
-      </p>
+          <button type="submit" id="btnEnviar">Avisar Portaria</button>
+        </form>
+
+        <div id="mensagemResultado" class="resultado" role="status" aria-live="polite"></div>
+
+        <p class="aviso-privacidade">
+          Seu e-mail e placa são usados só para liberar a entrada e ficam guardados por até 90 dias.
+        </p>
+      </div>
     </main>
   </div>
 
@@ -463,20 +439,27 @@
       var r = document.getElementById('mensagemResultado');
       if (!r) return;
       r.className = 'resultado erro';
-      r.textContent = 'Não foi possível carregar o sistema. Confira se firebase-config.js está na mesma pasta do site e abra a página por endereço http(s), não com duplo clique no arquivo. Detalhes: tecla F12 > aba Console.';
+      r.textContent = 'Não foi possível carregar o sistema. Confira a conexão.';
     }
     setTimeout(function () { if (!window.__cepanIniciou) falhaCarregamento(); }, 10000);
   </script>
+  
   <script type="module" onerror="falhaCarregamento()">
     import { db, auth, COLECAO, REGEX_PLACA } from "./firebase-config.js";
     import { collection, addDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const DIAS_RETENCAO = 90;
     const TIMEOUT_ENVIO_MS = 12000;
     const JANELA_DUPLICADO_MS = 3 * 60 * 1000; 
     let ultimoEnvio = { placa: '', em: 0 };
     const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+
+    // Elementos do DOM
+    const blocoLogin = document.getElementById('blocoLogin');
+    const blocoFormulario = document.getElementById('blocoFormulario');
+    const btnGoogle = document.getElementById('btnGoogle');
+    const btnSair = document.getElementById('btnSair');
 
     const form = document.getElementById('formAcesso');
     const selectEmpresa = document.getElementById('empresa');
@@ -494,45 +477,65 @@
     window.__cepanIniciou = true;
     resultado.replaceChildren();
 
-    // ---------- MODO ESCURO (Dark Mode) ----------
+    // ---------- MODO ESCURO ----------
     const armazenamento = {
       ler(chave) { try { return localStorage.getItem(chave); } catch { return null; } },
       gravar(chave, valor) { try { localStorage.setItem(chave, valor); return true; } catch { return false; } }
     };
 
     const btnTema = document.getElementById('btnTema');
-    
-    // Verifica se o motorista já tinha escolhido o modo escuro na última vez
     if (armazenamento.ler('cepan_tema') === 'escuro') {
       document.body.classList.add('tema-escuro');
       btnTema.innerHTML = '☀️ Claro';
     }
 
-    // Ação de clique no botão
     btnTema.addEventListener('click', () => {
       document.body.classList.toggle('tema-escuro');
-      
       const isEscuro = document.body.classList.contains('tema-escuro');
       armazenamento.gravar('cepan_tema', isEscuro ? 'escuro' : 'claro');
-      
       btnTema.innerHTML = isEscuro ? '☀️ Claro' : '🌙 Escuro';
     });
 
+    // ---------- AUTENTICAÇÃO COM GOOGLE ----------
+    let usuarioAtual = null;
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
 
-    // ---------- Autenticação anônima ----------
-    let authPronta = null;
-    function garantirAuth() {
-      if (!authPronta) {
-        authPronta = signInAnonymously(auth).then(cred => cred.user).catch(err => {
-          authPronta = null;
-          throw err;
-        });
+    btnGoogle.addEventListener('click', async () => {
+      try {
+        btnGoogle.disabled = true;
+        btnGoogle.innerHTML = 'Conectando...';
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        console.error(err);
+        btnGoogle.disabled = false;
+        btnGoogle.innerHTML = `<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg> Entrar com Google`;
       }
-      return authPronta;
-    }
-    garantirAuth().catch(err => console.error('Falha no login anônimo:', err));
+    });
 
-    // ---------- Utilidades ----------
+    btnSair.addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, (user) => {
+      // Se não for um usuário logado real (ignora anônimos perdidos do cache antigo)
+      if (user && !user.isAnonymous) {
+        usuarioAtual = user;
+        blocoLogin.style.display = 'none';
+        blocoFormulario.style.display = 'block';
+
+        // Puxa o nome e trava o campo
+        inputColaborador.value = user.displayName || user.email.split('@')[0];
+        avisoSalvo.style.display = 'block';
+        avisoSalvo.textContent = `✓ Logado como: ${user.email}`;
+      } else {
+        usuarioAtual = null;
+        blocoLogin.style.display = 'block';
+        blocoFormulario.style.display = 'none';
+        btnGoogle.disabled = false;
+        btnGoogle.innerHTML = `<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg> Entrar com Google`;
+      }
+    });
+
+    // ---------- UTILIDADES E VALIDAÇÃO ----------
     function comTimeout(promessa, ms) {
       let timer;
       const limite = new Promise((_, rejeitar) => {
@@ -565,21 +568,12 @@
       inputOutraEmpresa.required = mostrar;
     }
 
-    // ---------- Placa: só letras e números, maiúsculas ----------
     inputPlaca.addEventListener('input', (e) => {
       e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
     });
 
-    // ---------- Restaura dados salvos ----------
     (function restaurarDados() {
-      const nomeSalvo = armazenamento.ler('cepan_colaborador');
       const empresaSalva = armazenamento.ler('cepan_empresa');
-
-      if (nomeSalvo) {
-        inputColaborador.value = nomeSalvo;
-        avisoSalvo.style.display = 'block';
-      }
-
       if (empresaSalva) {
         const existe = [...selectEmpresa.options].some(opt => opt.value === empresaSalva && opt.value !== 'OUTRA');
         if (existe) {
@@ -689,16 +683,10 @@
       }
     });
 
-    // ---------- Envio ----------
-    function validarFormulario({ empresa, colaborador, placa }) {
-      if (!empresa) return { campo: selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa : selectEmpresa, msg: 'Informe a empresa.' };
-      if (colaborador.length < 2) return { campo: inputColaborador, msg: 'Informe seu nome.' };
-      if (!REGEX_PLACA.test(placa)) return { campo: inputPlaca, msg: 'Placa inválida. Use o formato ABC1234 ou ABC1D23.' };
-      return null;
-    }
-
+    // ---------- ENVIO DE DADOS ----------
     form.addEventListener('submit', async (evento) => {
       evento.preventDefault();
+      if (!usuarioAtual) return;
 
       const empresa = (selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa.value : selectEmpresa.value).trim();
       const colaborador = inputColaborador.value.trim();
@@ -706,10 +694,14 @@
       const veiculo = inputVeiculo.value.trim();
       const minutos = parseInt(selectTempo.value, 10);
 
-      const erroValidacao = validarFormulario({ empresa, colaborador, placa });
-      if (erroValidacao) {
-        mostrarResultado([{ forte: erroValidacao.msg }], true);
-        erroValidacao.campo.focus();
+      if (!empresa) {
+        mostrarResultado([{ forte: 'Informe a empresa.' }], true);
+        (selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa : selectEmpresa).focus();
+        return;
+      }
+      if (!REGEX_PLACA.test(placa)) {
+        mostrarResultado([{ forte: 'Placa inválida. Use o formato ABC1234 ou ABC1D23.' }], true);
+        inputPlaca.focus();
         return;
       }
 
@@ -722,25 +714,21 @@
       btnEnviar.textContent = 'Registrando na portaria...';
 
       try {
-        const usuario = await comTimeout(garantirAuth(), TIMEOUT_ENVIO_MS);
-
         await comTimeout(addDoc(collection(db, COLECAO), {
           empresa,
-          colaborador,
+          colaborador, // Agora é 100% o nome provado pelo Google
           placa,
           veiculo,
           minutosEstimados: minutos,
           status: 'AGUARDANDO',
           criadoEm: serverTimestamp(),
           expiraEm: Timestamp.fromMillis(Date.now() + DIAS_RETENCAO * 24 * 60 * 60 * 1000),
-          solicitanteUid: usuario.uid
+          solicitanteUid: usuarioAtual.uid,
+          solicitanteEmail: usuarioAtual.email // Chave mestra de segurança inserida aqui
         }), TIMEOUT_ENVIO_MS);
 
         ultimoEnvio = { placa, em: Date.now() };
-
-        const salvou = armazenamento.gravar('cepan_colaborador', colaborador) &&
-                       armazenamento.gravar('cepan_empresa', empresa);
-        avisoSalvo.style.display = salvou ? 'block' : 'none';
+        armazenamento.gravar('cepan_empresa', empresa); // Só precisa salvar a empresa agora
 
         const horaFormatada = new Date(Date.now() + minutos * 60000)
           .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -758,11 +746,9 @@
         console.error('Erro ao enviar:', erro);
         let msg = 'Não foi possível enviar. Tente novamente em instantes.';
         if (erro.code === 'timeout' || erro.code === 'unavailable') {
-          msg = 'Sem resposta do servidor. Verifique sua internet. Se o aviso chegou, a portaria já estará vendo: confirme antes de reenviar.';
+          msg = 'Sem resposta do servidor. Verifique sua internet. Se o aviso chegou, a portaria já verá.';
         } else if (erro.code === 'permission-denied') {
-          msg = 'Os dados foram recusados. Confira a placa e os campos e tente novamente.';
-        } else if (erro.code?.startsWith?.('auth/')) {
-          msg = 'Não foi possível conectar ao sistema de acesso. Recarregue a página.';
+          msg = 'Os dados foram recusados pelo servidor. Verifique se seu login é válido.';
         }
         mostrarResultado([{ forte: msg }], true);
       } finally {
