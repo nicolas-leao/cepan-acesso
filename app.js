@@ -1,75 +1,114 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  query, 
-  where, 
-  onSnapshot, 
-  doc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs 
+import { db, auth, COLECAO, COLECAO_PORTEIROS } from "./Firebase-config.js";
+import {
+  collection, query, where, orderBy, limit, onSnapshot,
+  doc, getDoc, getDocs, updateDoc, deleteDoc, serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+  signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  setPersistence, browserSessionPersistence
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// Configuração Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyCsO89sOJP9xoQH0-b4Lyf2D_E9ku_JKc0",
-  authDomain: "cepan-acesso.firebaseapp.com",
-  projectId: "cepan-acesso",
-  storageBucket: "cepan-acesso.firebasestorage.app",
-  messagingSenderId: "179404408385",
-  appId: "1:179404408385:web:6afff01f3b82ca6f2668c0"
-};
+// ================== Constantes ==================
+const INTERVALO_ATUALIZACAO_FILA_MS = 30000; 
+const LIMITE_RELATORIO_TUDO = 2000;
+const TITULO_BASE = document.title;
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// ================== Elementos do DOM ==================
+const telaLogin = document.getElementById('telaLogin');
+const formLogin = document.getElementById('formLogin');
+const textoLogin = document.getElementById('textoLogin');
+const camposLogin = document.getElementById('camposLogin');
+const inputEmail = document.getElementById('inputEmail');
+const inputSenha = document.getElementById('inputSenha');
+const btnEntrar = document.getElementById('btnEntrar');
+const erroLogin = document.getElementById('erroLogin');
 
-// Elementos do DOM
+const conteudoPainel = document.getElementById('conteudoPainel');
+const usuarioLogado = document.getElementById('usuarioLogado');
+const btnSair = document.getElementById('btnSairPortaria');
 const containerFila = document.getElementById('secaoFila');
+const secaoRelatorio = document.getElementById('secaoRelatorio');
 const contador = document.getElementById('qtdFila');
 const corpoTabela = document.getElementById('tabelaHistoricoCorpo');
+const notaRelatorio = document.getElementById('notaRelatorio');
 const btnAudioToggle = document.getElementById('btnAudioToggle');
 const inputBusca = document.getElementById('inputBusca');
 const tabFila = document.getElementById('tabFila');
 const tabRelatorio = document.getElementById('tabRelatorio');
 const btnExportar = document.getElementById('btnExportar');
+const botoesFiltro = document.querySelectorAll('.btn-filtro');
 
-// Variáveis de Estado
-let historicoCompleto = [];
-let filtroAtual = 'hoje';
-let audioAtivo = false;
-let quantidadeAnterior = 0;
-let primeiraCarga = true;
+// Avisa o script de diagnóstico do portaria.html que os módulos carregaram
+window.__cepanIniciou = true;
+erroLogin.textContent = '';
 
-// Funções de Áudio
-function tocarBip() {
-  if (!audioAtivo) return;
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.3);
-  } catch (e) {
-    console.error("Áudio bloqueado", e);
-  }
+// ================== Estado ==================
+const estado = {
+  fila: [],
+  historico: [],
+  visiveis: [],
+  filtro: 'hoje',
+  abaAtual: 'fila',
+  audioAtivo: false,
+  primeiraCarga: true,
+  pararFila: null,
+  timerFila: null,
+  processando: new Set(),
+  requisicaoRelatorio: 0,
+  admin: false 
+};
+
+let audioCtx = null;
+
+// ================== Utilidades ==================
+function el(tag, { classe, texto, attrs } = {}, filhos = []) {
+  const e = document.createElement(tag);
+  if (classe) e.className = classe;
+  if (texto !== undefined && texto !== null) e.textContent = texto;
+  if (attrs) for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  for (const f of filhos) if (f) e.append(f);
+  return e;
 }
 
-function alternarAudio() {
-  audioAtivo = !audioAtivo;
-  if (audioAtivo) {
-    btnAudioToggle.classList.add('ativo');
-    btnAudioToggle.innerText = '🔔 Alerta Sonoro: ON';
-    tocarBip();
-  } else {
-    btnAudioToggle.classList.remove('ativo');
-    btnAudioToggle.innerText = '🔔 Alerta Sonoro: OFF';
+function paraData(valor) {
+  if (!valor) return null;
+  if (typeof valor.toDate === 'function') return valor.toDate();
+  const d = new Date(valor);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function horaCurta(data) {
+  return data ? data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+}
+
+function inicioDoDia() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function normalizarSolicitacao(id, d) {
+  const criadoEm = paraData(d.criadoEm);
+  let previsto = null;
+  if (criadoEm && Number.isFinite(d.minutosEstimados)) {
+    previsto = new Date(criadoEm.getTime() + d.minutosEstimados * 60000);
+  } else if (d.horarioPrevisto) {
+    previsto = paraData(d.horarioPrevisto); 
   }
+
+  const veiculo = (d.veiculo && d.veiculo !== 'Não especificado') ? d.veiculo : '';
+
+  return {
+    id,
+    placa: d.placa || '-------',
+    veiculo,
+    colaborador: d.colaborador || '',
+    empresa: d.empresa || '',
+    status: d.status || '',
+    previsto,
+    finalizadoEm: paraData(d.liberadoEm),
+    finalizadoPor: d.finalizadoPor || ''
+  };
 }
 
 function obterClasseEmpresa(empresa) {
@@ -80,277 +119,458 @@ function obterClasseEmpresa(empresa) {
   return 'emp-outra';
 }
 
-// Monitoramento da Fila (Tempo Real)
-const q = query(collection(db, "solicitacoes_acesso"), where("status", "==", "AGUARDANDO"));
+// ================== Áudio ==================
+function alternarAudio() {
+  estado.audioAtivo = !estado.audioAtivo;
 
-onSnapshot(q, (snapshot) => {
-  let lista = [];
-  const agora = Date.now();
-
-  snapshot.forEach((documento) => {
-    const dados = documento.data();
-    const diferencaMs = dados.horarioPrevisto - agora;
-    lista.push({
-      id: documento.id,
-      ...dados,
-      minutosRestantes: Math.round(diferencaMs / 60000)
-    });
-  });
-
-  if (!primeiraCarga && lista.length > quantidadeAnterior) {
-    tocarBip();
+  if (estado.audioAtivo) {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx.resume();
+    } catch (e) {
+      console.error('Áudio indisponível', e);
+    }
   }
-  primeiraCarga = false;
-  quantidadeAnterior = lista.length;
 
-  lista.sort((a, b) => a.horarioPrevisto - b.horarioPrevisto);
-  contador.innerText = lista.length;
-  containerFila.innerHTML = '';
+  btnAudioToggle.classList.toggle('ativo', estado.audioAtivo);
+  btnAudioToggle.setAttribute('aria-pressed', String(estado.audioAtivo));
+  btnAudioToggle.textContent = `🔔 Alerta Sonoro: ${estado.audioAtivo ? 'ON' : 'OFF'}`;
+  if (estado.audioAtivo) tocarBip();
+}
 
-  if (lista.length === 0) {
-    containerFila.innerHTML = `
-      <div class="vazio">
-        <h3>Nenhum veículo aguardando na portaria</h3>
-        <p>Novos avisos de chegada aparecerão aqui automaticamente.</p>
-      </div>
-    `;
+function tocarBip() {
+  if (!estado.audioAtivo || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    [0, 0.35].forEach((atraso) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, t + atraso);
+      gain.gain.setValueAtTime(0.2, t + atraso);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + atraso + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t + atraso);
+      osc.stop(t + atraso + 0.3);
+    });
+  } catch (e) {
+    console.error('Falha ao tocar alerta', e);
+  }
+}
+
+// ================== Autenticação ==================
+function mostrarLogin(mensagemErro) {
+  pararTudo();
+  conteudoPainel.classList.add('oculto');
+  telaLogin.classList.remove('oculto');
+  textoLogin.textContent = 'Entre com o usuário da portaria:';
+  camposLogin.classList.remove('oculto');
+  if (mensagemErro) erroLogin.textContent = mensagemErro;
+  btnEntrar.disabled = false;
+  btnEntrar.textContent = 'Acessar Painel';
+  inputEmail.focus();
+}
+
+function mostrarPainel(usuario) {
+  telaLogin.classList.add('oculto');
+  conteudoPainel.classList.remove('oculto');
+  usuarioLogado.textContent = usuario.email || '';
+  inputSenha.value = '';
+  erroLogin.textContent = '';
+  trocarAba('fila');
+}
+
+formLogin.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  erroLogin.textContent = '';
+
+  const email = inputEmail.value.trim();
+  const senha = inputSenha.value;
+  if (!email || !senha) {
+    erroLogin.textContent = 'Informe e-mail e senha.';
     return;
   }
 
-  lista.forEach((item) => {
-    let classeUrgencia = 'urgencia-baixa';
-    let tagTexto = `~${item.minutosRestantes} min`;
-    let classeTag = 'tag-longe';
+  btnEntrar.disabled = true;
+  btnEntrar.textContent = 'Entrando...';
 
-    if (item.minutosRestantes <= 2) {
-      classeUrgencia = 'urgencia-alta';
-      tagTexto = item.minutosRestantes <= 0 ? 'Chegando agora' : `~${item.minutosRestantes} min`;
-      classeTag = 'tag-chegando';
-    } else if (item.minutosRestantes <= 6) {
-      classeUrgencia = 'urgencia-media';
-      classeTag = 'tag-perto';
-    }
-
-    const classeEmpresa = obterClasseEmpresa(item.empresa);
-
-    const card = document.createElement('div');
-    card.className = `card-veiculo ${classeUrgencia}`;
-    card.innerHTML = `
-      <div class="placa-box">${item.placa}</div>
-      <div class="info-veiculo">
-        <h3>${item.veiculo}</h3>
-        <p><strong>${item.colaborador}</strong> <span class="tag-empresa ${classeEmpresa}">${item.empresa}</span></p>
-      </div>
-      <div class="tempo-box">
-        <span class="tempo-tag ${classeTag}">${tagTexto}</span>
-        <div class="hora-prevista">Previsão: ${item.horarioPrevistoFormatado}</div>
-      </div>
-      <div class="acoes-card">
-        <button class="btn-liberar" data-id="${item.id}">Liberar</button>
-        <button class="btn-descartar" title="Descartar solicitação" data-id="${item.id}">✖</button>
-      </div>
-    `;
-    containerFila.appendChild(card);
-  });
-
-  document.querySelectorAll('.btn-liberar').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const docId = e.target.getAttribute('data-id');
-      await updateDoc(doc(db, "solicitacoes_acesso", docId), {
-        status: "LIBERADO",
-        liberadoEm: new Date().toISOString()
-      });
-    });
-  });
-
-  document.querySelectorAll('.btn-descartar').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const docId = e.target.getAttribute('data-id');
-      if (confirm("Deseja descartar esta solicitação?")) {
-        await updateDoc(doc(db, "solicitacoes_acesso", docId), {
-          status: "DESCARTADO",
-          liberadoEm: new Date().toISOString()
-        });
-      }
-    });
-  });
+  try {
+    await setPersistence(auth, browserSessionPersistence);
+    await signInWithEmailAndPassword(auth, email, senha);
+  } catch (erro) {
+    console.error(erro);
+    const mensagens = {
+      'auth/invalid-credential': 'E-mail ou senha incorretos.',
+      'auth/invalid-email': 'E-mail inválido.',
+      'auth/too-many-requests': 'Muitas tentativas. Aguarde alguns minutos e tente de novo.',
+      'auth/network-request-failed': 'Sem conexão com a internet.'
+    };
+    erroLogin.textContent = mensagens[erro.code] || 'Não foi possível entrar. Tente novamente.';
+    inputSenha.value = '';
+    btnEntrar.disabled = false;
+    btnEntrar.textContent = 'Acessar Painel';
+  }
 });
 
-// Gestão de Relatórios
-async function carregarRelatorio() {
-  corpoTabela.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px;">Atualizando...</td></tr>`;
-  
+onAuthStateChanged(auth, async (usuario) => {
+  pararTudo();
+
+  if (!usuario || usuario.isAnonymous) {
+    mostrarLogin();
+    return;
+  }
+
   try {
-    const querySnapshot = await getDocs(collection(db, "solicitacoes_acesso"));
-    historicoCompleto = [];
+    const perfil = await getDoc(doc(db, COLECAO_PORTEIROS, usuario.uid));
+    if (!perfil.exists()) {
+      await signOut(auth);
+      mostrarLogin('Este usuário não tem permissão de portaria.');
+      return;
+    }
+    estado.admin = perfil.data().admin === true;
+  } catch (erro) {
+    console.error(erro);
+    await signOut(auth);
+    mostrarLogin('Não foi possível validar o acesso. Verifique a conexão.');
+    return;
+  }
 
-    querySnapshot.forEach((doc) => {
-      const dados = doc.data();
-      if (dados.status === 'LIBERADO' || dados.status === 'DESCARTADO') {
-        historicoCompleto.push({ id: doc.id, ...dados });
-      }
+  mostrarPainel(usuario);
+  iniciarFila();
+});
+
+btnSair.addEventListener('click', () => signOut(auth));
+
+function pararTudo() {
+  if (estado.pararFila) estado.pararFila();
+  if (estado.timerFila) clearInterval(estado.timerFila);
+  estado.pararFila = null;
+  estado.timerFila = null;
+  estado.fila = [];
+  estado.historico = [];
+  estado.visiveis = [];
+  estado.processando.clear();
+  estado.admin = false;
+  estado.primeiraCarga = true;
+  document.title = TITULO_BASE;
+}
+
+// ================== Fila em tempo real ==================
+function iniciarFila() {
+  const q = query(collection(db, COLECAO), where('status', '==', 'AGUARDANDO'));
+
+  estado.pararFila = onSnapshot(q, (snapshot) => {
+    const chegouNovo = !estado.primeiraCarga &&
+      snapshot.docChanges().some(mudanca => mudanca.type === 'added');
+    estado.primeiraCarga = false;
+
+    estado.fila = snapshot.docs.map(d =>
+      normalizarSolicitacao(d.id, d.data({ serverTimestamps: 'estimate' })));
+
+    renderizarFila();
+    if (chegouNovo) tocarBip();
+  }, (erro) => {
+    console.error('Erro na fila:', erro);
+    containerFila.replaceChildren(el('div', { classe: 'vazio' }, [
+      el('h3', { texto: 'Sem conexão com o banco de dados' }),
+      el('p', { texto: 'Recarregue a página. Se persistir, verifique a internet da portaria.' })
+    ]));
+  });
+
+  estado.timerFila = setInterval(renderizarFila, INTERVALO_ATUALIZACAO_FILA_MS);
+}
+
+function renderizarFila() {
+  const total = estado.fila.length;
+  contador.textContent = total;
+  document.title = total ? `(${total}) ${TITULO_BASE}` : TITULO_BASE;
+
+  if (total === 0) {
+    containerFila.replaceChildren(el('div', { classe: 'vazio' }, [
+      el('h3', { texto: 'Nenhum veículo aguardando na portaria' }),
+      el('p', { texto: 'Novos avisos de chegada aparecerão aqui automaticamente.' })
+    ]));
+    return;
+  }
+
+  const agora = Date.now();
+  const ordenados = [...estado.fila].sort((a, b) =>
+    (a.previsto?.getTime() ?? Infinity) - (b.previsto?.getTime() ?? Infinity));
+
+  containerFila.replaceChildren(...ordenados.map(item => criarCardVeiculo(item, agora)));
+}
+
+function criarCardVeiculo(item, agora) {
+  const minutos = item.previsto ? Math.round((item.previsto.getTime() - agora) / 60000) : null;
+
+  let classeUrgencia = 'urgencia-baixa';
+  let classeTag = 'tag-longe';
+  let tagTexto = minutos === null ? 'Sem previsão' : `~${minutos} min`;
+
+  if (minutos !== null && minutos <= 2) {
+    classeUrgencia = 'urgencia-alta';
+    classeTag = 'tag-chegando';
+    if (minutos < -10) {
+      tagTexto = `Atrasado ${-minutos} min`;
+      classeTag = 'tag-atrasado';
+    } else if (minutos <= 0) {
+      tagTexto = 'Chegando agora';
+    }
+  } else if (minutos !== null && minutos <= 6) {
+    classeUrgencia = 'urgencia-media';
+    classeTag = 'tag-perto';
+  }
+
+  const ocupado = estado.processando.has(item.id);
+
+  const btnLiberar = el('button', {
+    classe: 'btn-liberar',
+    texto: ocupado ? 'Salvando...' : 'Liberar',
+    attrs: { type: 'button', 'data-acao': 'liberar', 'data-id': item.id }
+  });
+  const btnDescartar = el('button', {
+    classe: 'btn-descartar',
+    texto: '✖',
+    attrs: {
+      type: 'button', 'data-acao': 'descartar', 'data-id': item.id,
+      title: 'Descartar solicitação', 'aria-label': `Descartar solicitação da placa ${item.placa}`
+    }
+  });
+  btnLiberar.disabled = ocupado;
+  btnDescartar.disabled = ocupado;
+
+  return el('div', { classe: `card-veiculo ${classeUrgencia}` }, [
+    el('div', { classe: 'placa-box', texto: item.placa }),
+    el('div', { classe: 'info-veiculo' }, [
+      el('h3', { texto: item.veiculo || 'Modelo não informado' }),
+      el('p', {}, [
+        el('strong', { texto: item.colaborador }),
+        el('span', { classe: `tag-empresa ${obterClasseEmpresa(item.empresa)}`, texto: item.empresa })
+      ])
+    ]),
+    el('div', { classe: 'tempo-box' }, [
+      el('span', { classe: `tempo-tag ${classeTag}`, texto: tagTexto }),
+      el('div', { classe: 'hora-prevista', texto: `Previsão: ${horaCurta(item.previsto)}` })
+    ]),
+    el('div', { classe: 'acoes-card' }, [btnLiberar, btnDescartar])
+  ]);
+}
+
+containerFila.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-acao]');
+  if (!btn || btn.disabled) return;
+
+  const { acao, id } = btn.dataset;
+  if (acao === 'descartar' && !confirm('Deseja descartar esta solicitação?')) return;
+
+  await finalizarSolicitacao(id, acao === 'liberar' ? 'LIBERADO' : 'DESCARTADO');
+});
+
+async function finalizarSolicitacao(id, status) {
+  if (estado.processando.has(id)) return;
+  estado.processando.add(id);
+  renderizarFila();
+
+  try {
+    await updateDoc(doc(db, COLECAO, id), {
+      status,
+      liberadoEm: serverTimestamp(),
+      finalizadoPor: auth.currentUser?.email || ''
     });
+  } catch (erro) {
+    console.error('Erro ao atualizar:', erro);
+    alert(erro.code === 'permission-denied'
+      ? 'Esta solicitação já foi tratada por outro posto ou sua sessão expirou.'
+      : 'Não foi possível atualizar a solicitação. Verifique a conexão.');
+  } finally {
+    estado.processando.delete(id);
+    renderizarFila();
+  }
+}
 
-    historicoCompleto.sort((a, b) => new Date(b.liberadoEm || 0) - new Date(a.liberadoEm || 0));
+// ================== Relatório ==================
+function mostrarLinhaTabela(texto, classeExtra = '') {
+  corpoTabela.replaceChildren(el('tr', {}, [
+    el('td', { classe: `celula-info ${classeExtra}`.trim(), texto, attrs: { colspan: '8' } })
+  ]));
+}
+
+async function carregarRelatorio() {
+  const minhaRequisicao = ++estado.requisicaoRelatorio;
+  mostrarLinhaTabela('Atualizando...');
+  notaRelatorio.textContent = '';
+
+  const base = collection(db, COLECAO);
+  let q;
+  if (estado.filtro === 'tudo') {
+    q = query(base, orderBy('liberadoEm', 'desc'), limit(LIMITE_RELATORIO_TUDO));
+  } else {
+    const inicio = estado.filtro === 'hoje'
+      ? inicioDoDia()
+      : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    q = query(base, where('liberadoEm', '>=', Timestamp.fromDate(inicio)), orderBy('liberadoEm', 'desc'));
+  }
+
+  try {
+    const snapshot = await getDocs(q);
+    if (minhaRequisicao !== estado.requisicaoRelatorio) return; 
+
+    estado.historico = snapshot.docs
+      .map(d => normalizarSolicitacao(d.id, d.data()))
+      .filter(i => (i.status === 'LIBERADO' || i.status === 'DESCARTADO') && i.finalizadoEm)
+      .sort((a, b) => b.finalizadoEm - a.finalizadoEm);
+
+    if (estado.filtro === 'tudo' && snapshot.size >= LIMITE_RELATORIO_TUDO) {
+      notaRelatorio.textContent = `Mostrando os ${LIMITE_RELATORIO_TUDO} registros mais recentes.`;
+    }
+
     atualizarKPIs();
     renderizarTabela();
-  } catch (err) {
-    console.error(err);
-    corpoTabela.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding: 24px;">Erro ao carregar dados.</td></tr>`;
+  } catch (erro) {
+    if (minhaRequisicao !== estado.requisicaoRelatorio) return;
+    console.error(erro);
+    mostrarLinhaTabela('Erro ao carregar dados. Tente novamente.', 'celula-erro');
   }
 }
 
 function atualizarKPIs() {
-  const liberados = historicoCompleto.filter(i => i.status === 'LIBERADO' && i.liberadoEm && !isNaN(new Date(i.liberadoEm)));
-  const descartados = historicoCompleto.filter(i => i.status === 'DESCARTADO' && i.liberadoEm && !isNaN(new Date(i.liberadoEm)));
+  const liberados = estado.historico.filter(i => i.status === 'LIBERADO');
+  const descartados = estado.historico.filter(i => i.status === 'DESCARTADO');
 
-  document.getElementById('kpiTotal').innerText = liberados.length;
-  document.getElementById('kpiDescartados').innerText = descartados.length;
+  document.getElementById('kpiTotal').textContent = liberados.length;
+  document.getElementById('kpiDescartados').textContent = descartados.length;
 
-  const contagemEmpresas = {};
+  const contagem = new Map();
   liberados.forEach(i => {
-    contagemEmpresas[i.empresa] = (contagemEmpresas[i.empresa] || 0) + 1;
+    const nome = (i.empresa || '').trim();
+    const chave = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+    const atual = contagem.get(chave) || { nome, total: 0 };
+    atual.total++;
+    contagem.set(chave, atual);
   });
 
   let topEmpresa = '-';
   let maxAcessos = 0;
-  for (const [emp, total] of Object.entries(contagemEmpresas)) {
+  for (const { nome, total } of contagem.values()) {
     if (total > maxAcessos) {
       maxAcessos = total;
-      topEmpresa = `${emp} (${total})`;
+      topEmpresa = `${nome || 'Sem empresa'} (${total})`;
     }
   }
-  document.getElementById('kpiEmpresaTop').innerText = topEmpresa;
+  document.getElementById('kpiEmpresaTop').textContent = topEmpresa;
 }
 
 function renderizarTabela() {
-  const agora = new Date();
-  const termoBusca = inputBusca.value.toLowerCase().trim();
+  const termo = inputBusca.value.toLowerCase().replace(/[\s-]/g, '');
 
-  let filtrados = historicoCompleto.filter(item => {
-    if (!item.liberadoEm || isNaN(new Date(item.liberadoEm).getTime())) {
-      return false;
-    }
+  estado.visiveis = !termo ? estado.historico : estado.historico.filter(item =>
+    [item.placa, item.colaborador, item.empresa]
+      .some(campo => (campo || '').toLowerCase().replace(/[\s-]/g, '').includes(termo)));
 
-    const dataItem = new Date(item.liberadoEm);
-
-    let passaData = true;
-    if (filtroAtual === 'hoje') {
-      passaData = dataItem.toDateString() === agora.toDateString();
-    } else if (filtroAtual === 'semana') {
-      const seteDiasAtras = new Date();
-      seteDiasAtras.setDate(agora.getDate() - 7);
-      passaData = dataItem >= seteDiasAtras;
-    }
-
-    let passaBusca = true;
-    if (termoBusca) {
-      passaBusca = (item.placa || '').toLowerCase().includes(termoBusca) ||
-                   (item.colaborador || '').toLowerCase().includes(termoBusca) ||
-                   (item.empresa || '').toLowerCase().includes(termoBusca);
-    }
-
-    return passaData && passaBusca;
-  });
-
-  if (filtrados.length === 0) {
-    corpoTabela.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color:#94a3b8;">Nenhum registro encontrado.</td></tr>`;
+  if (estado.visiveis.length === 0) {
+    mostrarLinhaTabela('Nenhum registro encontrado.', 'celula-vazia');
     return;
   }
 
-  corpoTabela.innerHTML = '';
-  filtrados.forEach(item => {
-    const dataFormatada = new Date(item.liberadoEm).toLocaleString('pt-BR');
-    const isLiberado = item.status === 'LIBERADO';
-    
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><strong>${item.placa}</strong></td>
-      <td>${item.veiculo}</td>
-      <td>${item.colaborador}</td>
-      <td>${item.empresa}</td>
-      <td>${dataFormatada}</td>
-      <td><span class="badge-status ${isLiberado ? 'status-liberado' : 'status-descartado'}">${item.status}</span></td>
-      <td style="text-align: center;">
-        <button class="btn-descartar btn-excluir" style="padding: 4px 8px; font-size: 0.75rem;" data-id="${item.id}" data-placa="${item.placa}">
-          🗑️ Excluir
-        </button>
-      </td>
-    `;
-    corpoTabela.appendChild(tr);
-  });
-
-  document.querySelectorAll('.btn-excluir').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const docId = e.currentTarget.getAttribute('data-id');
-      const placa = e.currentTarget.getAttribute('data-placa');
-      await excluirRegistro(docId, placa);
-    });
-  });
+  corpoTabela.replaceChildren(...estado.visiveis.map(item => {
+    const liberado = item.status === 'LIBERADO';
+    return el('tr', {}, [
+      el('td', {}, [el('strong', { texto: item.placa })]),
+      el('td', { texto: item.veiculo || '-' }),
+      el('td', { texto: item.colaborador }),
+      el('td', { texto: item.empresa }),
+      el('td', { texto: item.finalizadoEm.toLocaleString('pt-BR') }),
+      el('td', {}, [el('span', {
+        classe: `badge-status ${liberado ? 'status-liberado' : 'status-descartado'}`,
+        texto: item.status
+      })]),
+      el('td', { classe: 'celula-por', texto: item.finalizadoPor || '-' }),
+      el('td', { classe: 'centro' }, estado.admin
+        ? [el('button', {
+            classe: 'btn-excluir',
+            texto: '🗑️ Excluir',
+            attrs: { type: 'button', 'data-id': item.id, 'data-placa': item.placa }
+          })]
+        : [document.createTextNode('—')])
+    ]);
+  }));
 }
 
-async function excluirRegistro(docId, placa) {
-  if (confirm(`Remover permanentemente o registro da placa ${placa} do relatório?`)) {
-    try {
-      await deleteDoc(doc(db, "solicitacoes_acesso", docId));
-      carregarRelatorio();
-    } catch (erro) {
-      console.error("Erro ao apagar registro:", erro);
-      alert("Erro ao excluir o registro do banco de dados.");
-    }
+corpoTabela.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.btn-excluir');
+  if (!btn || btn.disabled) return;
+  await excluirRegistro(btn, btn.dataset.id, btn.dataset.placa);
+});
+
+async function excluirRegistro(btn, docId, placa) {
+  if (!confirm(`Remover permanentemente o registro da placa ${placa} do relatório?`)) return;
+
+  btn.disabled = true;
+  try {
+    await deleteDoc(doc(db, COLECAO, docId));
+    estado.historico = estado.historico.filter(i => i.id !== docId);
+    atualizarKPIs();
+    renderizarTabela();
+  } catch (erro) {
+    console.error('Erro ao apagar registro:', erro);
+    alert('Erro ao excluir o registro do banco de dados.');
+    btn.disabled = false;
   }
 }
 
-function trocarAba(aba) {
-  if (aba === 'fila') {
-    tabFila.classList.add('active');
-    tabRelatorio.classList.remove('active');
-    document.getElementById('secaoFila').style.display = 'flex';
-    document.getElementById('secaoRelatorio').style.display = 'none';
-  } else {
-    tabRelatorio.classList.add('active');
-    tabFila.classList.remove('active');
-    document.getElementById('secaoFila').style.display = 'none';
-    document.getElementById('secaoRelatorio').style.display = 'block';
-    carregarRelatorio();
-  }
+// ================== Exportação CSV ==================
+function celulaCSV(valor) {
+  let s = String(valor ?? '');
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return `"${s.replace(/"/g, '""')}"`;
 }
 
 function exportarCSV() {
-  if (historicoCompleto.length === 0) {
-    alert("Sem dados para exportar.");
+  if (estado.visiveis.length === 0) {
+    alert('Sem dados para exportar.');
     return;
   }
 
-  let csv = "Placa;Veiculo;Solicitante;Empresa;Data e Hora;Status\n";
-  historicoCompleto.forEach(r => {
-    if (r.liberadoEm && !isNaN(new Date(r.liberadoEm))) {
-      const dataHora = new Date(r.liberadoEm).toLocaleString('pt-BR');
-      csv += `"${r.placa}";"${r.veiculo}";"${r.colaborador}";"${r.empresa}";"${dataHora}";"${r.status}"\n`;
-    }
-  });
+  const cabecalho = ['Placa', 'Veiculo', 'Solicitante', 'Empresa', 'Data e Hora', 'Status', 'Finalizado por'];
+  const linhas = estado.visiveis.map(r => [
+    r.placa, r.veiculo, r.colaborador, r.empresa,
+    r.finalizadoEm.toLocaleString('pt-BR'), r.status, r.finalizadoPor
+  ].map(celulaCSV).join(';'));
 
-  const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+  const csv = [cabecalho.map(celulaCSV).join(';'), ...linhas].join('\r\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `relatorio_cepan_${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `relatorio_cepan_${estado.filtro}_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// Event Listeners
+// ================== Abas e filtros ==================
+function trocarAba(aba) {
+  estado.abaAtual = aba;
+  const fila = aba === 'fila';
+  tabFila.classList.toggle('active', fila);
+  tabRelatorio.classList.toggle('active', !fila);
+  containerFila.style.display = fila ? 'flex' : 'none';
+  secaoRelatorio.style.display = fila ? 'none' : 'block';
+  if (!fila) carregarRelatorio();
+}
+
 btnAudioToggle.addEventListener('click', alternarAudio);
 tabFila.addEventListener('click', () => trocarAba('fila'));
 tabRelatorio.addEventListener('click', () => trocarAba('relatorio'));
 inputBusca.addEventListener('input', renderizarTabela);
 btnExportar.addEventListener('click', exportarCSV);
 
-document.querySelectorAll('.btn-filtro').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    filtroAtual = e.target.getAttribute('data-filtro');
-    document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    renderizarTabela();
+botoesFiltro.forEach(btn => {
+  btn.addEventListener('click', () => {
+    estado.filtro = btn.dataset.filtro;
+    botoesFiltro.forEach(b => b.classList.toggle('active', b === btn));
+    carregarRelatorio();
   });
 });

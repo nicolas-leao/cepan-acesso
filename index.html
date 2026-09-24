@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Acesso CEPAN - Solicitação de Veículo</title>
-  
-  <!-- Biblioteca OCR Tesseract.js via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
     * {
@@ -24,9 +21,11 @@
       align-items: center;
       justify-content: flex-start;
       padding: 24px 16px 36px;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     .app-container {
+      position: relative; 
       width: 100%;
       max-width: 460px;
       display: flex;
@@ -41,6 +40,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      margin-top: 10px;
     }
 
     .logo-cepan {
@@ -48,7 +48,8 @@
       width: 100%;
       height: auto;
       margin-bottom: 12px;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+      mix-blend-mode: multiply;
+      transition: filter 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .header-projeto .badge-projeto {
@@ -76,6 +77,7 @@
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
       border: 1px solid #e2e8f0;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .card-header {
@@ -97,6 +99,7 @@
     }
 
     .box-ocr {
+      display: block;
       background-color: #f8fafc;
       border: 2px dashed #94a3b8;
       border-radius: 10px;
@@ -104,13 +107,17 @@
       text-align: center;
       margin-bottom: 20px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
       -webkit-tap-highlight-color: transparent;
     }
 
-    .box-ocr:hover, .box-ocr:active {
+    .box-ocr:hover, .box-ocr:active, .box-ocr:focus-within {
       border-color: #2563eb;
       background-color: #eff6ff;
+    }
+
+    .box-ocr:focus-within {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
     }
 
     .box-ocr span {
@@ -127,12 +134,24 @@
       display: block;
     }
 
+    .visualmente-oculto {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     .status-ocr {
       font-size: 0.82rem;
       margin-top: 8px;
-      display: none;
       font-weight: 600;
     }
+
+    .status-ocr:empty { display: none; }
 
     .status-processando { color: #2563eb; }
     .status-sucesso { color: #16a34a; }
@@ -140,7 +159,7 @@
 
     .campo { margin-bottom: 16px; }
 
-    label {
+    label.rotulo {
       display: block;
       font-size: 0.85rem;
       font-weight: 600;
@@ -154,19 +173,19 @@
       font-size: 0.78rem;
     }
 
-    input, select {
+    input[type="text"], select {
       width: 100%;
       padding: 12px 14px;
       border: 1.5px solid #cbd5e1;
       border-radius: 10px;
       font-size: 0.95rem;
       outline: none;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
       background-color: #ffffff;
       color: #0f172a;
     }
 
-    input:focus, select:focus {
+    input[type="text"]:focus, select:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
@@ -176,6 +195,13 @@
       font-weight: 700;
       letter-spacing: 2px;
       font-size: 1.1rem;
+    }
+
+    .dica-campo {
+      display: block;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 4px;
     }
 
     #campoOutraEmpresa {
@@ -195,10 +221,11 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 8px;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease;
     }
 
     button:hover { background-color: #1d4ed8; }
+    button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
     button:disabled { background-color: #94a3b8; cursor: not-allowed; }
 
     .info-storage {
@@ -216,23 +243,142 @@
       background-color: #f0fdf4;
       border: 1px solid #bbf7d0;
       color: #15803d;
-      display: none;
       font-size: 0.88rem;
       line-height: 1.5;
+    }
+
+    .resultado.erro {
+      background-color: #fef2f2;
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+
+    .resultado:empty { display: none; }
+
+    .aviso-privacidade {
+      margin-top: 16px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* =========================================
+       BOTÃO E TEMA ESCURO (DARK MODE)
+       ========================================= */
+    .btn-tema {
+      position: absolute;
+      top: -10px;
+      right: 0px;
+      width: auto;
+      background: #ffffff;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      z-index: 10;
+      margin-top: 0;
+    }
+
+    .btn-tema:hover {
+      background: #f8fafc;
+      transform: translateY(-2px);
+    }
+
+    /* REGRAS DE CORES QUANDO O MODO ESCURO ESTIVER ATIVO */
+    body.tema-escuro {
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: #f8fafc;
+    }
+
+    body.tema-escuro .btn-tema {
+      background: #1e293b;
+      color: #f8fafc;
+      border-color: #334155;
+    }
+
+    body.tema-escuro .card {
+      background: #1e293b;
+      border-color: #334155;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    body.tema-escuro .card-header h2,
+    body.tema-escuro label.rotulo,
+    body.tema-escuro .box-ocr span {
+      color: #f1f5f9;
+    }
+
+    body.tema-escuro .card-header p,
+    body.tema-escuro .opcional,
+    body.tema-escuro .dica-campo,
+    body.tema-escuro .box-ocr small,
+    body.tema-escuro .header-projeto p {
+      color: #94a3b8;
+    }
+
+    body.tema-escuro input[type="text"],
+    body.tema-escuro select {
+      background-color: #0f172a;
+      border-color: #475569;
+      color: #f8fafc;
+    }
+
+    body.tema-escuro .box-ocr {
+      background-color: #0f172a;
+      border-color: #475569;
+    }
+
+    /* Ajuste da Logo para destacar no fundo escuro (Fundo Branco Arredondado) */
+    body.tema-escuro .logo-cepan {
+      filter: none;
+      mix-blend-mode: normal;
+      background-color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Alerta de Sucesso/Erro Escuro */
+    body.tema-escuro .resultado {
+      background-color: #064e3b;
+      border-color: #059669;
+      color: #6ee7b7;
+    }
+
+    body.tema-escuro .resultado.erro {
+      background-color: #7f1d1d;
+      border-color: #b91c1c;
+      color: #fca5a5;
     }
 
     @media (min-width: 768px) {
       body { justify-content: center; padding: 40px 20px; }
       .card { padding: 32px 28px; }
       .logo-cepan { max-width: 270px; }
+      .btn-tema { top: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
     }
   </style>
 </head>
 <body>
 
   <div class="app-container">
+    
+    <!-- BOTÃO MODO ESCURO -->
+    <button type="button" id="btnTema" class="btn-tema" aria-label="Alternar tema">🌙 Escuro</button>
+
     <header class="header-projeto">
-      <img src="logo.png" alt="CEPAN" class="logo-cepan" />
+      <!-- Imagem atualizada para logo_2.png -->
+      <img src="logo_2.png" alt="CEPAN" class="logo-cepan" width="800" height="236" />
       <span class="badge-projeto">Portaria Inteligente</span>
       <p>Aviso de Chegada de Veículos</p>
     </header>
@@ -243,16 +389,16 @@
         <p>Preencha os dados ou anexe o print da corrida</p>
       </div>
 
-      <div class="box-ocr" id="areaOcr" onclick="document.getElementById('inputPrint').click()">
-        <input type="file" id="inputPrint" accept="image/*" style="display: none;" />
+      <label class="box-ocr" for="inputPrint">
+        <input type="file" id="inputPrint" accept="image/*" class="visualmente-oculto" />
         <span>📷 Anexar print do Uber / 99</span>
         <small>Toque para escolher o print na sua galeria</small>
-        <div id="statusOcr" class="status-ocr"></div>
-      </div>
+        <div id="statusOcr" class="status-ocr" role="status" aria-live="polite"></div>
+      </label>
 
-      <form id="formAcesso">
+      <form id="formAcesso" novalidate>
         <div class="campo">
-          <label for="empresa">Empresa</label>
+          <label class="rotulo" for="empresa">Empresa</label>
           <select id="empresa" required>
             <option value="">Selecione sua empresa...</option>
             <option value="Domo Soluções">Domo Soluções</option>
@@ -260,28 +406,33 @@
             <option value="Avell">Avell</option>
             <option value="OUTRA">Outra empresa (digitar nome)</option>
           </select>
-          
-          <input type="text" id="campoOutraEmpresa" placeholder="Digite o nome da empresa" />
+
+          <input type="text" id="campoOutraEmpresa" placeholder="Digite o nome da empresa"
+                 maxlength="60" aria-label="Nome da empresa" />
         </div>
 
         <div class="campo">
-          <label for="colaborador">Seu Nome</label>
-          <input type="text" id="colaborador" placeholder="Ex: Seu Nome" required />
-          <span class="info-storage" id="avisoSalvo" style="display: none;">✓ Dados salvos automaticamente</span>
+          <label class="rotulo" for="colaborador">Seu Nome</label>
+          <input type="text" id="colaborador" placeholder="Ex: Seu Nome" required
+                 minlength="2" maxlength="80" autocomplete="name" />
+          <span class="info-storage" id="avisoSalvo" style="display: none;">✓ Dados salvos neste aparelho</span>
         </div>
 
         <div class="campo">
-          <label for="placa">Placa do Veículo</label>
-          <input type="text" id="placa" placeholder="Ex: ABC1D23" maxlength="7" required />
+          <label class="rotulo" for="placa">Placa do Veículo</label>
+          <input type="text" id="placa" placeholder="Ex: ABC1D23" maxlength="7" required
+                 pattern="[A-Z]{3}[0-9][A-Z0-9][0-9]{2}" autocomplete="off" autocapitalize="characters"
+                 spellcheck="false" aria-describedby="dicaPlaca" />
+          <span class="dica-campo" id="dicaPlaca">Confira a placa no app antes de enviar.</span>
         </div>
 
         <div class="campo">
-          <label for="veiculo">Modelo / Cor <span class="opcional">(Opcional)</span></label>
-          <input type="text" id="veiculo" placeholder="Ex: Onix Prata" />
+          <label class="rotulo" for="veiculo">Modelo / Cor <span class="opcional">(Opcional)</span></label>
+          <input type="text" id="veiculo" placeholder="Ex: Onix Prata" maxlength="60" />
         </div>
 
         <div class="campo">
-          <label for="tempo">Previsão no app (Uber / 99 / Táxi)</label>
+          <label class="rotulo" for="tempo">Previsão no app (Uber / 99 / Táxi)</label>
           <select id="tempo" required>
             <option value="3">Chega em ~3 minutos</option>
             <option value="5" selected>Chega em ~5 minutos</option>
@@ -294,25 +445,34 @@
         <button type="submit" id="btnEnviar">Avisar Portaria</button>
       </form>
 
-      <div id="mensagemSucesso" class="resultado"></div>
+      <div id="mensagemResultado" class="resultado" role="status" aria-live="polite"></div>
+
+      <p class="aviso-privacidade">
+        Nome, empresa e placa são usados só para liberar sua entrada e ficam guardados por até 90 dias.
+        O print é lido no seu próprio aparelho e não é enviado.
+      </p>
     </main>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <script>
+    function falhaCarregamento() {
+      var r = document.getElementById('mensagemResultado');
+      if (!r) return;
+      r.className = 'resultado erro';
+      r.textContent = 'Não foi possível carregar o sistema. Confira se firebase-config.js está na mesma pasta do site e abra a página por endereço http(s), não com duplo clique no arquivo. Detalhes: tecla F12 > aba Console.';
+    }
+    setTimeout(function () { if (!window.__cepanIniciou) falhaCarregamento(); }, 10000);
+  </script>
+  <script type="module" onerror="falhaCarregamento()">
+    import { db, auth, COLECAO, REGEX_PLACA } from "./firebase-config.js";
+    import { collection, addDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCsO89sOJP9xoQH0-b4Lyf2D_E9ku_JKc0",
-      authDomain: "cepan-acesso.firebaseapp.com",
-      projectId: "cepan-acesso",
-      storageBucket: "cepan-acesso.firebasestorage.app",
-      messagingSenderId: "179404408385",
-      appId: "1:179404408385:web:6afff01f3b82ca6f2668c0"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const DIAS_RETENCAO = 90;
+    const TIMEOUT_ENVIO_MS = 12000;
+    const JANELA_DUPLICADO_MS = 3 * 60 * 1000; 
+    let ultimoEnvio = { placa: '', em: 0 };
+    const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
 
     const form = document.getElementById('formAcesso');
     const selectEmpresa = document.getElementById('empresa');
@@ -321,20 +481,95 @@
     const inputPlaca = document.getElementById('placa');
     const inputVeiculo = document.getElementById('veiculo');
     const selectTempo = document.getElementById('tempo');
-    const resultado = document.getElementById('mensagemSucesso');
+    const resultado = document.getElementById('mensagemResultado');
     const avisoSalvo = document.getElementById('avisoSalvo');
     const btnEnviar = document.getElementById('btnEnviar');
     const inputPrint = document.getElementById('inputPrint');
     const statusOcr = document.getElementById('statusOcr');
 
-    inputPlaca.addEventListener('input', (e) => {
-      let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      e.target.value = val.slice(0, 7);
+    window.__cepanIniciou = true;
+    resultado.replaceChildren();
+
+    // ---------- MODO ESCURO (Dark Mode) ----------
+    const armazenamento = {
+      ler(chave) { try { return localStorage.getItem(chave); } catch { return null; } },
+      gravar(chave, valor) { try { localStorage.setItem(chave, valor); return true; } catch { return false; } }
+    };
+
+    const btnTema = document.getElementById('btnTema');
+    
+    // Verifica se o motorista já tinha escolhido o modo escuro na última vez
+    if (armazenamento.ler('cepan_tema') === 'escuro') {
+      document.body.classList.add('tema-escuro');
+      btnTema.innerHTML = '☀️ Claro';
+    }
+
+    // Ação de clique no botão
+    btnTema.addEventListener('click', () => {
+      document.body.classList.toggle('tema-escuro');
+      
+      const isEscuro = document.body.classList.contains('tema-escuro');
+      armazenamento.gravar('cepan_tema', isEscuro ? 'escuro' : 'claro');
+      
+      btnTema.innerHTML = isEscuro ? '☀️ Claro' : '🌙 Escuro';
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const nomeSalvo = localStorage.getItem('cepan_colaborador');
-      const empresaSalva = localStorage.getItem('cepan_empresa');
+
+    // ---------- Autenticação anônima ----------
+    let authPronta = null;
+    function garantirAuth() {
+      if (!authPronta) {
+        authPronta = signInAnonymously(auth).then(cred => cred.user).catch(err => {
+          authPronta = null;
+          throw err;
+        });
+      }
+      return authPronta;
+    }
+    garantirAuth().catch(err => console.error('Falha no login anônimo:', err));
+
+    // ---------- Utilidades ----------
+    function comTimeout(promessa, ms) {
+      let timer;
+      const limite = new Promise((_, rejeitar) => {
+        timer = setTimeout(() => rejeitar(Object.assign(new Error('timeout'), { code: 'timeout' })), ms);
+      });
+      return Promise.race([promessa, limite]).finally(() => clearTimeout(timer));
+    }
+
+    function definirStatusOcr(texto, tipo) {
+      statusOcr.className = `status-ocr status-${tipo}`;
+      statusOcr.textContent = texto;
+    }
+
+    function mostrarResultado(linhas, erro = false) {
+      resultado.classList.toggle('erro', erro);
+      resultado.replaceChildren();
+      linhas.forEach((linha, i) => {
+        if (i > 0) resultado.append(document.createElement('br'));
+        if (linha.forte) {
+          const strong = document.createElement('strong');
+          strong.textContent = linha.forte;
+          resultado.append(strong);
+        }
+        if (linha.texto) resultado.append(document.createTextNode(linha.texto));
+      });
+    }
+
+    function mostrarOutraEmpresa(mostrar) {
+      inputOutraEmpresa.style.display = mostrar ? 'block' : 'none';
+      inputOutraEmpresa.required = mostrar;
+    }
+
+    // ---------- Placa: só letras e números, maiúsculas ----------
+    inputPlaca.addEventListener('input', (e) => {
+      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+    });
+
+    // ---------- Restaura dados salvos ----------
+    (function restaurarDados() {
+      const nomeSalvo = armazenamento.ler('cepan_colaborador');
+      const empresaSalva = armazenamento.ler('cepan_empresa');
 
       if (nomeSalvo) {
         inputColaborador.value = nomeSalvo;
@@ -342,123 +577,193 @@
       }
 
       if (empresaSalva) {
-        let existe = false;
-        for (let opt of selectEmpresa.options) {
-          if (opt.value === empresaSalva) {
-            selectEmpresa.value = empresaSalva;
-            existe = true;
-            break;
-          }
-        }
-        if (!existe) {
+        const existe = [...selectEmpresa.options].some(opt => opt.value === empresaSalva && opt.value !== 'OUTRA');
+        if (existe) {
+          selectEmpresa.value = empresaSalva;
+        } else {
           selectEmpresa.value = 'OUTRA';
-          inputOutraEmpresa.style.display = 'block';
+          mostrarOutraEmpresa(true);
           inputOutraEmpresa.value = empresaSalva;
         }
       }
-    });
+    })();
 
     selectEmpresa.addEventListener('change', () => {
-      if (selectEmpresa.value === 'OUTRA') {
-        inputOutraEmpresa.style.display = 'block';
-        inputOutraEmpresa.required = true;
-        inputOutraEmpresa.focus();
-      } else {
-        inputOutraEmpresa.style.display = 'none';
-        inputOutraEmpresa.required = false;
-      }
+      const outra = selectEmpresa.value === 'OUTRA';
+      mostrarOutraEmpresa(outra);
+      if (outra) inputOutraEmpresa.focus();
     });
 
+    // ---------- OCR ----------
+    let tesseractCarregando = null;
+    function carregarTesseract() {
+      if (window.Tesseract) return Promise.resolve(window.Tesseract);
+      if (!tesseractCarregando) {
+        tesseractCarregando = new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = TESSERACT_URL;
+          script.async = true;
+          script.onload = () => resolve(window.Tesseract);
+          script.onerror = () => { tesseractCarregando = null; reject(new Error('Falha ao carregar o OCR')); };
+          document.head.appendChild(script);
+        });
+      }
+      return tesseractCarregando;
+    }
+
+    const PARA_LETRA = { '0': 'O', '1': 'I', '2': 'Z', '4': 'A', '5': 'S', '6': 'G', '7': 'T', '8': 'B' };
+    const PARA_NUMERO = { 'O': '0', 'Q': '0', 'D': '0', 'U': '0', 'I': '1', 'L': '1', 'J': '1',
+                          'Z': '2', 'A': '4', 'S': '5', 'G': '6', 'T': '7', 'B': '8' };
+
+    function corrigirCandidato(bruto) {
+      let correcoes = 0;
+      const placa = bruto.split('').map((c, i) => {
+        const deveSerLetra = i < 3;
+        const deveSerNumero = i === 3 || i >= 5; 
+        if (deveSerLetra && /[0-9]/.test(c) && PARA_LETRA[c]) { correcoes++; return PARA_LETRA[c]; }
+        if (deveSerNumero && /[A-Z]/.test(c) && PARA_NUMERO[c]) { correcoes++; return PARA_NUMERO[c]; }
+        return c;
+      }).join('');
+      return REGEX_PLACA.test(placa) ? { placa, correcoes } : null;
+    }
+
+    function extrairPlaca(texto) {
+      const limpo = texto.toUpperCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z0-9 \-.\n]/g, ' ');
+      const regex = /\b([A-Z0-9]{3})[ \-.]{0,3}([A-Z0-9]{4})\b/g;
+      const candidatos = [];
+      for (const m of limpo.matchAll(regex)) {
+        const r = corrigirCandidato(m[1] + m[2]);
+        if (r && r.correcoes <= 2) candidatos.push(r);
+      }
+      candidatos.sort((a, b) => a.correcoes - b.correcoes);
+      return candidatos.length ? candidatos[0].placa : null;
+    }
+
+    let ocrEmAndamento = false;
     async function processarImagemPrint(arquivoImagem) {
-      statusOcr.style.display = 'block';
-      statusOcr.className = 'status-ocr status-processando';
-      statusOcr.innerText = '🔍 Lendo print...';
+      if (ocrEmAndamento) return;
+      ocrEmAndamento = true;
+      definirStatusOcr('🔍 Lendo print...', 'processando');
 
       try {
-        const resultadoLeitura = await Tesseract.recognize(arquivoImagem, 'por');
-        const textoExtraido = resultadoLeitura.data.text.toUpperCase();
+        const Tesseract = await carregarTesseract();
+        const leitura = await Tesseract.recognize(arquivoImagem, 'eng');
+        const placa = extrairPlaca(leitura.data.text || '');
 
-        const regexPlaca = /([A-Z]{3}[0-9][A-Z0-9][0-9]{2})/g;
-        const match = textoExtraido.match(regexPlaca);
-
-        if (match && match.length > 0) {
-          inputPlaca.value = match[0].replace(/[^A-Z0-9]/g, '');
-          statusOcr.className = 'status-ocr status-sucesso';
-          statusOcr.innerText = `✓ Placa identificada: ${inputPlaca.value}`;
+        if (placa) {
+          inputPlaca.value = placa;
+          definirStatusOcr(`✓ Placa lida: ${placa}. Confira antes de enviar.`, 'sucesso');
         } else {
-          statusOcr.className = 'status-ocr status-falha';
-          statusOcr.innerText = 'Não identificamos a placa. Digite manualmente abaixo.';
+          definirStatusOcr('Não identificamos a placa. Digite manualmente abaixo.', 'falha');
+          inputPlaca.focus();
         }
       } catch (err) {
         console.error(err);
-        statusOcr.className = 'status-ocr status-falha';
-        statusOcr.innerText = 'Erro ao processar imagem.';
+        definirStatusOcr('Não foi possível ler o print. Digite a placa manualmente.', 'falha');
+      } finally {
+        ocrEmAndamento = false;
+        inputPrint.value = ''; 
       }
     }
 
     inputPrint.addEventListener('change', (e) => {
-      if (e.target.files && e.target.files[0]) {
-        processarImagemPrint(e.target.files[0]);
-      }
+      const arquivo = e.target.files && e.target.files[0];
+      if (arquivo) processarImagemPrint(arquivo);
     });
 
     window.addEventListener('paste', (e) => {
-      const itens = (e.clipboardData || e.originalEvent.clipboardData).items;
-      for (let item of itens) {
+      const itens = e.clipboardData?.items;
+      if (!itens) return;
+      for (const item of itens) {
         if (item.kind === 'file' && item.type.startsWith('image/')) {
-          processarImagemPrint(item.getAsFile());
+          const arquivo = item.getAsFile();
+          if (arquivo) processarImagemPrint(arquivo);
           break;
         }
       }
     });
 
+    // ---------- Envio ----------
+    function validarFormulario({ empresa, colaborador, placa }) {
+      if (!empresa) return { campo: selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa : selectEmpresa, msg: 'Informe a empresa.' };
+      if (colaborador.length < 2) return { campo: inputColaborador, msg: 'Informe seu nome.' };
+      if (!REGEX_PLACA.test(placa)) return { campo: inputPlaca, msg: 'Placa inválida. Use o formato ABC1234 ou ABC1D23.' };
+      return null;
+    }
+
     form.addEventListener('submit', async (evento) => {
       evento.preventDefault();
-      btnEnviar.disabled = true;
-      btnEnviar.innerText = "Registrando na portaria...";
 
-      let empresaFinal = selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa.value.trim() : selectEmpresa.value;
+      const empresa = (selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa.value : selectEmpresa.value).trim();
       const colaborador = inputColaborador.value.trim();
       const placa = inputPlaca.value.trim().toUpperCase();
-      const veiculo = inputVeiculo.value.trim() || 'Não especificado';
-      const minutos = parseInt(selectTempo.value);
+      const veiculo = inputVeiculo.value.trim();
+      const minutos = parseInt(selectTempo.value, 10);
 
-      localStorage.setItem('cepan_colaborador', colaborador);
-      localStorage.setItem('cepan_empresa', empresaFinal);
-      avisoSalvo.style.display = 'block';
+      const erroValidacao = validarFormulario({ empresa, colaborador, placa });
+      if (erroValidacao) {
+        mostrarResultado([{ forte: erroValidacao.msg }], true);
+        erroValidacao.campo.focus();
+        return;
+      }
 
-      const previsaoData = new Date(Date.now() + minutos * 60000);
-      const horaFormatada = previsaoData.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      if (ultimoEnvio.placa === placa && Date.now() - ultimoEnvio.em < JANELA_DUPLICADO_MS &&
+          !confirm(`A placa ${placa} já foi enviada há poucos minutos. Enviar novamente?`)) {
+        return;
+      }
+
+      btnEnviar.disabled = true;
+      btnEnviar.textContent = 'Registrando na portaria...';
 
       try {
-        await addDoc(collection(db, "solicitacoes_acesso"), {
-          empresa: empresaFinal,
-          colaborador: colaborador,
-          placa: placa,
-          veiculo: veiculo,
-          minutosEstimados: minutos,
-          horarioPrevisto: previsaoData.getTime(),
-          horarioPrevistoFormatado: horaFormatada,
-          status: "AGUARDANDO",
-          criadoEm: serverTimestamp()
-        });
+        const usuario = await comTimeout(garantirAuth(), TIMEOUT_ENVIO_MS);
 
-        resultado.style.display = 'block';
-        resultado.innerHTML = `
-          <strong>✓ Enviado para a Portaria!</strong><br>
-          🚗 <strong>Placa:</strong> ${placa} (${veiculo})<br>
-          ⏱️ <strong>Previsão de chegada:</strong> às ${horaFormatada} (~${minutos} min)
-        `;
+        await comTimeout(addDoc(collection(db, COLECAO), {
+          empresa,
+          colaborador,
+          placa,
+          veiculo,
+          minutosEstimados: minutos,
+          status: 'AGUARDANDO',
+          criadoEm: serverTimestamp(),
+          expiraEm: Timestamp.fromMillis(Date.now() + DIAS_RETENCAO * 24 * 60 * 60 * 1000),
+          solicitanteUid: usuario.uid
+        }), TIMEOUT_ENVIO_MS);
+
+        ultimoEnvio = { placa, em: Date.now() };
+
+        const salvou = armazenamento.gravar('cepan_colaborador', colaborador) &&
+                       armazenamento.gravar('cepan_empresa', empresa);
+        avisoSalvo.style.display = salvou ? 'block' : 'none';
+
+        const horaFormatada = new Date(Date.now() + minutos * 60000)
+          .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        mostrarResultado([
+          { forte: '✓ Enviado para a Portaria!' },
+          { forte: '🚗 Placa: ', texto: veiculo ? `${placa} (${veiculo})` : placa },
+          { forte: '⏱️ Previsão de chegada: ', texto: `às ${horaFormatada} (~${minutos} min)` }
+        ]);
 
         inputPlaca.value = '';
         inputVeiculo.value = '';
-        statusOcr.style.display = 'none';
+        statusOcr.textContent = '';
       } catch (erro) {
-        console.error("Erro ao salvar:", erro);
-        alert("Erro ao conectar com o banco de dados.");
+        console.error('Erro ao enviar:', erro);
+        let msg = 'Não foi possível enviar. Tente novamente em instantes.';
+        if (erro.code === 'timeout' || erro.code === 'unavailable') {
+          msg = 'Sem resposta do servidor. Verifique sua internet. Se o aviso chegou, a portaria já estará vendo: confirme antes de reenviar.';
+        } else if (erro.code === 'permission-denied') {
+          msg = 'Os dados foram recusados. Confira a placa e os campos e tente novamente.';
+        } else if (erro.code?.startsWith?.('auth/')) {
+          msg = 'Não foi possível conectar ao sistema de acesso. Recarregue a página.';
+        }
+        mostrarResultado([{ forte: msg }], true);
       } finally {
         btnEnviar.disabled = false;
-        btnEnviar.innerText = "Avisar Portaria";
+        btnEnviar.textContent = 'Avisar Portaria';
       }
     });
   </script>
