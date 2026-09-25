@@ -9,333 +9,71 @@
   <link rel="apple-touch-icon" href="icone.png" />
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 100%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 24px 16px 36px;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-
-    .app-container {
-      position: relative; 
-      width: 100%;
-      max-width: 460px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .header-projeto {
-      text-align: center;
-      margin-bottom: 20px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .logo-cepan {
-      max-width: 240px;
-      width: 100%;
-      height: auto;
-      margin-bottom: 12px;
-      mix-blend-mode: multiply;
-      transition: filter 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .header-projeto .badge-projeto {
-      display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      background-color: #dbeafe;
-      color: #1d4ed8;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      margin-bottom: 4px;
-    }
-
-    .header-projeto p {
-      font-size: 0.88rem;
-      color: #64748b;
-    }
-
-    .card {
-      background: #ffffff;
-      width: 100%;
-      padding: 28px 24px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-      border: 1px solid #e2e8f0;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-    }
-
-    .card-header {
-      margin-bottom: 20px;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .card-header h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #1e293b;
-    }
-
-    .card-header p {
-      font-size: 0.85rem;
-      color: #64748b;
-      margin-top: 2px;
-    }
-
-    .btn-sair {
-      background-color: #f1f5f9;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 0;
-      width: auto;
-    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; margin: 0; padding: 0; }
+    body { background: linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 24px 16px 36px; transition: background 0.3s ease, color 0.3s ease; }
+    .app-container { position: relative; width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; }
+    .header-projeto { text-align: center; margin-bottom: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
+    .logo-cepan { max-width: 240px; width: 100%; height: auto; margin-bottom: 12px; mix-blend-mode: multiply; transition: filter 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease; }
+    .header-projeto .badge-projeto { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background-color: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 9999px; margin-bottom: 4px; }
+    .header-projeto p { font-size: 0.88rem; color: #64748b; }
+    .card { background: #ffffff; width: 100%; padding: 28px 24px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04); border: 1px solid #e2e8f0; transition: background-color 0.3s ease, border-color 0.3s ease; }
+    .card-header { margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-header h2 { font-size: 1.15rem; font-weight: 700; color: #1e293b; }
+    .card-header p { font-size: 0.85rem; color: #64748b; margin-top: 2px; }
+    .btn-sair { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-top: 0; width: auto; }
     .btn-sair:hover { background-color: #e2e8f0; color: #1e293b; }
-
-    /* Estilos Login Google */
-    .btn-google {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      background-color: #ffffff;
-      color: #334155;
-      border: 1px solid #cbd5e1;
-      padding: 14px 24px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-    .btn-google:hover:not(:disabled) { background-color: #f8fafc; border-color: #94a3b8; transform: translateY(-2px); }
-    .btn-google:disabled { opacity: 0.7; cursor: not-allowed; }
-
-    .box-ocr {
-      display: block;
-      background-color: #f8fafc;
-      border: 2px dashed #94a3b8;
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
-      margin-bottom: 20px;
-      cursor: pointer;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .box-ocr:hover, .box-ocr:active, .box-ocr:focus-within {
-      border-color: #2563eb;
-      background-color: #eff6ff;
-    }
-
-    .box-ocr span {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #334155;
-    }
-
-    .box-ocr small {
-      font-size: 0.78rem;
-      color: #64748b;
-      margin-top: 2px;
-      display: block;
-    }
-
-    .visualmente-oculto {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .status-ocr {
-      font-size: 0.82rem;
-      margin-top: 8px;
-      font-weight: 600;
-    }
+    .botoes-login { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; margin: 0 auto; }
+    .btn-social { display: inline-flex; align-items: center; justify-content: center; gap: 12px; background-color: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 14px 20px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); width: 100%; }
+    .btn-social:hover:not(:disabled) { background-color: #f8fafc; border-color: #94a3b8; transform: translateY(-2px); }
+    .btn-social:disabled { opacity: 0.7; cursor: not-allowed; }
+    .box-ocr { display: block; background-color: #f8fafc; border: 2px dashed #94a3b8; border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: border-color 0.2s ease, background-color 0.2s ease; -webkit-tap-highlight-color: transparent; }
+    .box-ocr:hover, .box-ocr:active, .box-ocr:focus-within { border-color: #2563eb; background-color: #eff6ff; }
+    .box-ocr:focus-within { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
+    .box-ocr span { display: block; font-size: 0.9rem; font-weight: 600; color: #334155; }
+    .box-ocr small { font-size: 0.78rem; color: #64748b; margin-top: 2px; display: block; }
+    .visualmente-oculto { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .status-ocr { font-size: 0.82rem; margin-top: 8px; font-weight: 600; }
     .status-ocr:empty { display: none; }
     .status-processando { color: #2563eb; }
     .status-sucesso { color: #16a34a; }
     .status-falha { color: #dc2626; }
-
     .campo { margin-bottom: 16px; }
-
-    label.rotulo {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #334155;
-      margin-bottom: 6px;
-    }
-
+    label.rotulo { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px; }
     .opcional { font-weight: normal; color: #94a3b8; font-size: 0.78rem; }
-
-    input[type="text"], select {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
-      background-color: #ffffff;
-      color: #0f172a;
-    }
-
-    input[type="text"]:focus:not(:read-only), select:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-    
-    /* Input Bloqueado (Nome Puxado do Google) */
-    input:read-only {
-      background-color: #f1f5f9 !important;
-      color: #64748b !important;
-      cursor: not-allowed;
-      border-color: #e2e8f0 !important;
-    }
-
-    #placa {
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 2px;
-      font-size: 1.1rem;
-    }
-
-    .dica-campo {
-      display: block;
-      font-size: 0.75rem;
-      color: #64748b;
-      margin-top: 4px;
-    }
-
+    input[type="text"], select { width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease; background-color: #ffffff; color: #0f172a; }
+    input[type="text"]:focus:not(:read-only), select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+    input:read-only { background-color: #f1f5f9 !important; color: #64748b !important; cursor: not-allowed; border-color: #e2e8f0 !important; }
+    #placa { text-transform: uppercase; font-weight: 700; letter-spacing: 2px; font-size: 1.1rem; }
+    .dica-campo { display: block; font-size: 0.75rem; color: #64748b; margin-top: 4px; }
     #campoOutraEmpresa { display: none; margin-top: 8px; border-style: dashed; }
-
-    button[type="submit"] {
-      width: 100%;
-      background-color: #2563eb;
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background-color 0.2s ease;
-    }
+    button[type="submit"] { width: 100%; background-color: #2563eb; color: #ffffff; border: none; padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background-color 0.2s ease; }
     button[type="submit"]:hover { background-color: #1d4ed8; }
     button[type="submit"]:disabled { background-color: #94a3b8; cursor: not-allowed; }
-
-    .info-storage {
-      display: block;
-      font-size: 0.75rem;
-      color: #16a34a;
-      margin-top: 4px;
-      font-weight: 500;
-    }
-
-    .resultado {
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 10px;
-      background-color: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #15803d;
-      font-size: 0.88rem;
-      line-height: 1.5;
-    }
+    .info-storage { display: block; font-size: 0.75rem; color: #16a34a; margin-top: 4px; font-weight: 500; }
+    .resultado { margin-top: 20px; padding: 16px; border-radius: 10px; background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; font-size: 0.88rem; line-height: 1.5; }
     .resultado.erro { background-color: #fef2f2; border-color: #fecaca; color: #b91c1c; }
     .resultado:empty { display: none; }
-
-    .aviso-privacidade {
-      margin-top: 16px;
-      font-size: 0.72rem;
-      color: #94a3b8;
-      text-align: center;
-      line-height: 1.4;
-    }
-
+    .aviso-privacidade { margin-top: 16px; font-size: 0.72rem; color: #94a3b8; text-align: center; line-height: 1.4; }
+    
     /* MODO ESCURO */
-    .btn-tema {
-      position: absolute;
-      top: -10px;
-      right: 0px;
-      width: auto;
-      background: #ffffff;
-      color: #334155;
-      border: 1px solid #e2e8f0;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease;
-      z-index: 10;
-      margin-top: 0;
-    }
+    .btn-tema { position: absolute; top: -10px; right: 0px; width: auto; background: #ffffff; color: #334155; border: 1px solid #e2e8f0; padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; z-index: 10; margin-top: 0; }
     .btn-tema:hover { background: #f8fafc; transform: translateY(-2px); }
-
     body.tema-escuro { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: #f8fafc; }
     body.tema-escuro .btn-tema { background: #1e293b; color: #f8fafc; border-color: #334155; }
     body.tema-escuro .card { background: #1e293b; border-color: #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
     body.tema-escuro .card-header h2, body.tema-escuro label.rotulo, body.tema-escuro .box-ocr span { color: #f1f5f9; }
     body.tema-escuro .card-header p, body.tema-escuro .opcional, body.tema-escuro .dica-campo, body.tema-escuro .box-ocr small, body.tema-escuro .header-projeto p { color: #94a3b8; }
-    
     body.tema-escuro input[type="text"], body.tema-escuro select { background-color: #0f172a; border-color: #475569; color: #f8fafc; }
     body.tema-escuro input:read-only { background-color: #0f172a !important; color: #94a3b8 !important; border-color: #334155 !important; }
     body.tema-escuro .box-ocr { background-color: #0f172a; border-color: #475569; }
     body.tema-escuro .logo-cepan { filter: none; mix-blend-mode: normal; background-color: #ffffff; padding: 10px 20px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
     body.tema-escuro .resultado { background-color: #064e3b; border-color: #059669; color: #6ee7b7; }
     body.tema-escuro .resultado.erro { background-color: #7f1d1d; border-color: #b91c1c; color: #fca5a5; }
-    body.tema-escuro .btn-google { background-color: #0f172a; border-color: #475569; color: #f1f5f9; }
-    body.tema-escuro .btn-google:hover:not(:disabled) { background-color: #1e293b; }
+    body.tema-escuro .btn-social { background-color: #0f172a; border-color: #475569; color: #f1f5f9; }
+    body.tema-escuro .btn-social:hover:not(:disabled) { background-color: #1e293b; }
     body.tema-escuro .btn-sair { background-color: #0f172a; color: #94a3b8; border-color: #334155; }
     body.tema-escuro .btn-sair:hover { background-color: #ef4444; color: #fff; border-color: #ef4444; }
-
-    @media (min-width: 768px) {
-      body { justify-content: center; padding: 40px 20px; }
-      .card { padding: 32px 28px; }
-      .logo-cepan { max-width: 270px; }
-      .btn-tema { top: 0; }
-    }
+    @media (min-width: 768px) { body { justify-content: center; padding: 40px 20px; } .card { padding: 32px 28px; } .logo-cepan { max-width: 270px; } .btn-tema { top: 0; } }
   </style>
 </head>
 <body>
@@ -350,19 +88,22 @@
     </header>
 
     <main class="card">
-      
-      <!-- TELA DE LOGIN (Mostrada para usuários não logados) -->
-      <div id="blocoLogin" style="text-align: center; padding: 30px 10px;">
+      <div id="blocoLogin" style="text-align: center; padding: 20px 10px;">
         <h2 style="margin-bottom: 12px; font-size: 1.25rem;">Acesso Corporativo</h2>
         <p style="margin-bottom: 24px; font-size: 0.9rem; color: #64748b;">Faça login com sua conta corporativa para solicitar a liberação do seu veículo na portaria.</p>
         
-        <button type="button" id="btnGoogle" class="btn-google">
-          <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
-          Entrar com Google
-        </button>
+        <div class="botoes-login">
+          <button type="button" id="btnGoogle" class="btn-social">
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+            Entrar com Google
+          </button>
+          <button type="button" id="btnMicrosoft" class="btn-social">
+            <svg width="20" height="20" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+            Entrar com Microsoft
+          </button>
+        </div>
       </div>
 
-      <!-- TELA DO FORMULÁRIO (Mostrada apenas se logado) -->
       <div id="blocoFormulario" style="display: none;">
         <div class="card-header">
           <div>
@@ -374,16 +115,22 @@
 
         <label class="box-ocr" for="inputPrint">
           <input type="file" id="inputPrint" accept="image/*" class="visualmente-oculto" />
-          <span>📷 Anexar print do Uber / 99</span>
-          <small>Toque para escolher o print na sua galeria</small>
+          <span>📷 Anexar print do Uber / 99 para ler a placa</span>
+          <small>O arquivo não será salvo, apenas lido.</small>
           <div id="statusOcr" class="status-ocr" role="status" aria-live="polite"></div>
         </label>
 
         <form id="formAcesso" novalidate>
           <div class="campo">
-            <label class="rotulo" for="colaborador">Seu Nome</label>
-            <input type="text" id="colaborador" required readonly title="Seu nome é puxado automaticamente do e-mail" />
+            <label class="rotulo" for="colaborador">Autorizado por (Seu Nome)</label>
+            <input type="text" id="colaborador" required readonly title="Seu nome é puxado automaticamente" />
             <span class="info-storage" id="avisoSalvo" style="display: none;"></span>
+          </div>
+
+          <!-- NOVO CAMPO DE VISITANTE -->
+          <div class="campo">
+            <label class="rotulo" for="visitante">Nome do Visitante / Terceiro <span class="opcional">(Preencha se não for você)</span></label>
+            <input type="text" id="visitante" placeholder="Ex: Roberto da Manutenção" maxlength="80" />
           </div>
 
           <div class="campo">
@@ -397,20 +144,18 @@
             </select>
             <input type="text" id="campoOutraEmpresa" placeholder="Digite o nome da empresa" maxlength="60" />
           </div>
-
+          
           <div class="campo">
             <label class="rotulo" for="placa">Placa do Veículo</label>
-            <input type="text" id="placa" placeholder="Ex: ABC1D23" maxlength="7" required
-                   pattern="[A-Z]{3}[0-9][A-Z0-9][0-9]{2}" autocomplete="off" autocapitalize="characters"
-                   spellcheck="false" aria-describedby="dicaPlaca" />
+            <input type="text" id="placa" placeholder="Ex: ABC1D23" maxlength="7" required pattern="[A-Z]{3}[0-9][A-Z0-9][0-9]{2}" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="dicaPlaca" />
             <span class="dica-campo" id="dicaPlaca">Confira a placa no app antes de enviar.</span>
           </div>
-
+          
           <div class="campo">
             <label class="rotulo" for="veiculo">Modelo / Cor <span class="opcional">(Opcional)</span></label>
             <input type="text" id="veiculo" placeholder="Ex: Onix Prata" maxlength="60" />
           </div>
-
+          
           <div class="campo">
             <label class="rotulo" for="tempo">Previsão no app (Uber / 99 / Táxi)</label>
             <select id="tempo" required>
@@ -421,15 +166,11 @@
               <option value="20">Chega em ~20 minutos</option>
             </select>
           </div>
-
           <button type="submit" id="btnEnviar">Avisar Portaria</button>
         </form>
 
         <div id="mensagemResultado" class="resultado" role="status" aria-live="polite"></div>
-
-        <p class="aviso-privacidade">
-          Seu e-mail e placa são usados só para liberar a entrada e ficam guardados por até 90 dias.
-        </p>
+        <p class="aviso-privacidade">Seu e-mail e placa são usados só para liberar a entrada e ficam guardados por até 90 dias.</p>
       </div>
     </main>
   </div>
@@ -437,9 +178,7 @@
   <script>
     function falhaCarregamento() {
       var r = document.getElementById('mensagemResultado');
-      if (!r) return;
-      r.className = 'resultado erro';
-      r.textContent = 'Não foi possível carregar o sistema. Confira a conexão.';
+      if (!r) return; r.className = 'resultado erro'; r.textContent = 'Não foi possível carregar o sistema. Confira a conexão.';
     }
     setTimeout(function () { if (!window.__cepanIniciou) falhaCarregamento(); }, 10000);
   </script>
@@ -447,48 +186,31 @@
   <script type="module" onerror="falhaCarregamento()">
     import { db, auth, COLECAO, REGEX_PLACA } from "./firebase-config.js";
     import { collection, addDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { GoogleAuthProvider, OAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const DIAS_RETENCAO = 90;
-    const TIMEOUT_ENVIO_MS = 12000;
-    const JANELA_DUPLICADO_MS = 3 * 60 * 1000; 
+    const DIAS_RETENCAO = 90; const TIMEOUT_ENVIO_MS = 15000; const JANELA_DUPLICADO_MS = 3 * 60 * 1000; 
     let ultimoEnvio = { placa: '', em: 0 };
     const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
 
-    // Elementos do DOM
-    const blocoLogin = document.getElementById('blocoLogin');
-    const blocoFormulario = document.getElementById('blocoFormulario');
-    const btnGoogle = document.getElementById('btnGoogle');
-    const btnSair = document.getElementById('btnSair');
+    const blocoLogin = document.getElementById('blocoLogin'); const blocoFormulario = document.getElementById('blocoFormulario');
+    const btnGoogle = document.getElementById('btnGoogle'); const btnMicrosoft = document.getElementById('btnMicrosoft'); const btnSair = document.getElementById('btnSair');
+    const form = document.getElementById('formAcesso'); const selectEmpresa = document.getElementById('empresa');
+    const inputOutraEmpresa = document.getElementById('campoOutraEmpresa'); const inputColaborador = document.getElementById('colaborador');
+    const inputVisitante = document.getElementById('visitante');
+    const inputPlaca = document.getElementById('placa'); const inputVeiculo = document.getElementById('veiculo');
+    const selectTempo = document.getElementById('tempo'); const resultado = document.getElementById('mensagemResultado');
+    const avisoSalvo = document.getElementById('avisoSalvo'); const btnEnviar = document.getElementById('btnEnviar');
+    const inputPrint = document.getElementById('inputPrint'); const statusOcr = document.getElementById('statusOcr');
 
-    const form = document.getElementById('formAcesso');
-    const selectEmpresa = document.getElementById('empresa');
-    const inputOutraEmpresa = document.getElementById('campoOutraEmpresa');
-    const inputColaborador = document.getElementById('colaborador');
-    const inputPlaca = document.getElementById('placa');
-    const inputVeiculo = document.getElementById('veiculo');
-    const selectTempo = document.getElementById('tempo');
-    const resultado = document.getElementById('mensagemResultado');
-    const avisoSalvo = document.getElementById('avisoSalvo');
-    const btnEnviar = document.getElementById('btnEnviar');
-    const inputPrint = document.getElementById('inputPrint');
-    const statusOcr = document.getElementById('statusOcr');
+    window.__cepanIniciou = true; resultado.replaceChildren();
 
-    window.__cepanIniciou = true;
-    resultado.replaceChildren();
-
-    // ---------- MODO ESCURO ----------
     const armazenamento = {
       ler(chave) { try { return localStorage.getItem(chave); } catch { return null; } },
       gravar(chave, valor) { try { localStorage.setItem(chave, valor); return true; } catch { return false; } }
     };
 
     const btnTema = document.getElementById('btnTema');
-    if (armazenamento.ler('cepan_tema') === 'escuro') {
-      document.body.classList.add('tema-escuro');
-      btnTema.innerHTML = '☀️ Claro';
-    }
-
+    if (armazenamento.ler('cepan_tema') === 'escuro') { document.body.classList.add('tema-escuro'); btnTema.innerHTML = '☀️ Claro'; }
     btnTema.addEventListener('click', () => {
       document.body.classList.toggle('tema-escuro');
       const isEscuro = document.body.classList.contains('tema-escuro');
@@ -496,113 +218,61 @@
       btnTema.innerHTML = isEscuro ? '☀️ Claro' : '🌙 Escuro';
     });
 
-    // ---------- AUTENTICAÇÃO COM GOOGLE ----------
     let usuarioAtual = null;
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
+    const googleProvider = new GoogleAuthProvider(); googleProvider.setCustomParameters({ prompt: 'select_account' });
+    const msProvider = new OAuthProvider('microsoft.com'); msProvider.setCustomParameters({ prompt: 'select_account' });
 
-    btnGoogle.addEventListener('click', async () => {
-      try {
-        btnGoogle.disabled = true;
-        btnGoogle.innerHTML = 'Conectando...';
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        console.error(err);
-        btnGoogle.disabled = false;
-        btnGoogle.innerHTML = `<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg> Entrar com Google`;
-      }
-    });
-
+    function travarBotoes(conectando) { btnGoogle.disabled = conectando; btnMicrosoft.disabled = conectando; }
+    btnGoogle.addEventListener('click', async () => { try { travarBotoes(true); btnGoogle.innerHTML = 'Conectando...'; await signInWithPopup(auth, googleProvider); } catch (err) { console.error(err); travarBotoes(false); btnGoogle.innerHTML = `Entrar com Google`; }});
+    btnMicrosoft.addEventListener('click', async () => { try { travarBotoes(true); btnMicrosoft.innerHTML = 'Conectando...'; await signInWithPopup(auth, msProvider); } catch (err) { console.error(err); travarBotoes(false); btnMicrosoft.innerHTML = `Entrar com Microsoft`; }});
     btnSair.addEventListener('click', () => signOut(auth));
 
     onAuthStateChanged(auth, (user) => {
-      // Se não for um usuário logado real (ignora anônimos perdidos do cache antigo)
       if (user && !user.isAnonymous) {
-        usuarioAtual = user;
-        blocoLogin.style.display = 'none';
-        blocoFormulario.style.display = 'block';
-
-        // Puxa o nome e trava o campo
+        usuarioAtual = user; blocoLogin.style.display = 'none'; blocoFormulario.style.display = 'block';
         inputColaborador.value = user.displayName || user.email.split('@')[0];
-        avisoSalvo.style.display = 'block';
-        avisoSalvo.textContent = `✓ Logado como: ${user.email}`;
+        avisoSalvo.style.display = 'block'; avisoSalvo.textContent = `✓ Logado como: ${user.email}`;
       } else {
-        usuarioAtual = null;
-        blocoLogin.style.display = 'block';
-        blocoFormulario.style.display = 'none';
-        btnGoogle.disabled = false;
-        btnGoogle.innerHTML = `<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg> Entrar com Google`;
+        usuarioAtual = null; blocoLogin.style.display = 'block'; blocoFormulario.style.display = 'none'; travarBotoes(false);
       }
     });
 
-    // ---------- UTILIDADES E VALIDAÇÃO ----------
     function comTimeout(promessa, ms) {
-      let timer;
-      const limite = new Promise((_, rejeitar) => {
-        timer = setTimeout(() => rejeitar(Object.assign(new Error('timeout'), { code: 'timeout' })), ms);
-      });
+      let timer; const limite = new Promise((_, rejeitar) => { timer = setTimeout(() => rejeitar(Object.assign(new Error('timeout'), { code: 'timeout' })), ms); });
       return Promise.race([promessa, limite]).finally(() => clearTimeout(timer));
     }
 
-    function definirStatusOcr(texto, tipo) {
-      statusOcr.className = `status-ocr status-${tipo}`;
-      statusOcr.textContent = texto;
-    }
-
+    function definirStatusOcr(texto, tipo) { statusOcr.className = `status-ocr status-${tipo}`; statusOcr.textContent = texto; }
     function mostrarResultado(linhas, erro = false) {
-      resultado.classList.toggle('erro', erro);
-      resultado.replaceChildren();
+      resultado.classList.toggle('erro', erro); resultado.replaceChildren();
       linhas.forEach((linha, i) => {
         if (i > 0) resultado.append(document.createElement('br'));
-        if (linha.forte) {
-          const strong = document.createElement('strong');
-          strong.textContent = linha.forte;
-          resultado.append(strong);
-        }
+        if (linha.forte) { const strong = document.createElement('strong'); strong.textContent = linha.forte; resultado.append(strong); }
         if (linha.texto) resultado.append(document.createTextNode(linha.texto));
       });
     }
 
-    function mostrarOutraEmpresa(mostrar) {
-      inputOutraEmpresa.style.display = mostrar ? 'block' : 'none';
-      inputOutraEmpresa.required = mostrar;
-    }
-
-    inputPlaca.addEventListener('input', (e) => {
-      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
-    });
+    function mostrarOutraEmpresa(mostrar) { inputOutraEmpresa.style.display = mostrar ? 'block' : 'none'; inputOutraEmpresa.required = mostrar; }
+    inputPlaca.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7); });
 
     (function restaurarDados() {
       const empresaSalva = armazenamento.ler('cepan_empresa');
       if (empresaSalva) {
         const existe = [...selectEmpresa.options].some(opt => opt.value === empresaSalva && opt.value !== 'OUTRA');
-        if (existe) {
-          selectEmpresa.value = empresaSalva;
-        } else {
-          selectEmpresa.value = 'OUTRA';
-          mostrarOutraEmpresa(true);
-          inputOutraEmpresa.value = empresaSalva;
-        }
+        if (existe) selectEmpresa.value = empresaSalva;
+        else { selectEmpresa.value = 'OUTRA'; mostrarOutraEmpresa(true); inputOutraEmpresa.value = empresaSalva; }
       }
     })();
 
-    selectEmpresa.addEventListener('change', () => {
-      const outra = selectEmpresa.value === 'OUTRA';
-      mostrarOutraEmpresa(outra);
-      if (outra) inputOutraEmpresa.focus();
-    });
+    selectEmpresa.addEventListener('change', () => { const outra = selectEmpresa.value === 'OUTRA'; mostrarOutraEmpresa(outra); if (outra) inputOutraEmpresa.focus(); });
 
-    // ---------- OCR ----------
     let tesseractCarregando = null;
     function carregarTesseract() {
       if (window.Tesseract) return Promise.resolve(window.Tesseract);
       if (!tesseractCarregando) {
         tesseractCarregando = new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = TESSERACT_URL;
-          script.async = true;
-          script.onload = () => resolve(window.Tesseract);
-          script.onerror = () => { tesseractCarregando = null; reject(new Error('Falha ao carregar o OCR')); };
+          const script = document.createElement('script'); script.src = TESSERACT_URL; script.async = true;
+          script.onload = () => resolve(window.Tesseract); script.onerror = () => { tesseractCarregando = null; reject(new Error('Falha OCR')); };
           document.head.appendChild(script);
         });
       }
@@ -610,14 +280,12 @@
     }
 
     const PARA_LETRA = { '0': 'O', '1': 'I', '2': 'Z', '4': 'A', '5': 'S', '6': 'G', '7': 'T', '8': 'B' };
-    const PARA_NUMERO = { 'O': '0', 'Q': '0', 'D': '0', 'U': '0', 'I': '1', 'L': '1', 'J': '1',
-                          'Z': '2', 'A': '4', 'S': '5', 'G': '6', 'T': '7', 'B': '8' };
+    const PARA_NUMERO = { 'O': '0', 'Q': '0', 'D': '0', 'U': '0', 'I': '1', 'L': '1', 'J': '1', 'Z': '2', 'A': '4', 'S': '5', 'G': '6', 'T': '7', 'B': '8' };
 
     function corrigirCandidato(bruto) {
       let correcoes = 0;
       const placa = bruto.split('').map((c, i) => {
-        const deveSerLetra = i < 3;
-        const deveSerNumero = i === 3 || i >= 5; 
+        const deveSerLetra = i < 3; const deveSerNumero = i === 3 || i >= 5; 
         if (deveSerLetra && /[0-9]/.test(c) && PARA_LETRA[c]) { correcoes++; return PARA_LETRA[c]; }
         if (deveSerNumero && /[A-Z]/.test(c) && PARA_NUMERO[c]) { correcoes++; return PARA_NUMERO[c]; }
         return c;
@@ -626,135 +294,72 @@
     }
 
     function extrairPlaca(texto) {
-      const limpo = texto.toUpperCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^A-Z0-9 \-.\n]/g, ' ');
+      const limpo = texto.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9 \-.\n]/g, ' ');
       const regex = /\b([A-Z0-9]{3})[ \-.]{0,3}([A-Z0-9]{4})\b/g;
       const candidatos = [];
-      for (const m of limpo.matchAll(regex)) {
-        const r = corrigirCandidato(m[1] + m[2]);
-        if (r && r.correcoes <= 2) candidatos.push(r);
-      }
-      candidatos.sort((a, b) => a.correcoes - b.correcoes);
-      return candidatos.length ? candidatos[0].placa : null;
+      for (const m of limpo.matchAll(regex)) { const r = corrigirCandidato(m[1] + m[2]); if (r && r.correcoes <= 2) candidatos.push(r); }
+      candidatos.sort((a, b) => a.correcoes - b.correcoes); return candidatos.length ? candidatos[0].placa : null;
     }
 
     let ocrEmAndamento = false;
     async function processarImagemPrint(arquivoImagem) {
-      if (ocrEmAndamento) return;
-      ocrEmAndamento = true;
-      definirStatusOcr('🔍 Lendo print...', 'processando');
-
+      if (ocrEmAndamento) return; ocrEmAndamento = true; definirStatusOcr('🔍 Lendo print...', 'processando');
       try {
-        const Tesseract = await carregarTesseract();
-        const leitura = await Tesseract.recognize(arquivoImagem, 'eng');
+        const Tesseract = await carregarTesseract(); const leitura = await Tesseract.recognize(arquivoImagem, 'eng');
         const placa = extrairPlaca(leitura.data.text || '');
-
-        if (placa) {
-          inputPlaca.value = placa;
-          definirStatusOcr(`✓ Placa lida: ${placa}. Confira antes de enviar.`, 'sucesso');
-        } else {
-          definirStatusOcr('Não identificamos a placa. Digite manualmente abaixo.', 'falha');
-          inputPlaca.focus();
-        }
-      } catch (err) {
-        console.error(err);
-        definirStatusOcr('Não foi possível ler o print. Digite a placa manualmente.', 'falha');
-      } finally {
-        ocrEmAndamento = false;
-        inputPrint.value = ''; 
-      }
+        if (placa) { inputPlaca.value = placa; definirStatusOcr(`✓ Placa lida: ${placa}.`, 'sucesso'); } 
+        else { definirStatusOcr('Não identificamos a placa. Digite-a abaixo.', 'falha'); inputPlaca.focus(); }
+      } catch (err) { definirStatusOcr('Não foi possível ler o print. Digite a placa manualmente.', 'falha'); } 
+      finally { ocrEmAndamento = false; inputPrint.value = ''; }
     }
 
     inputPrint.addEventListener('change', (e) => {
       const arquivo = e.target.files && e.target.files[0];
-      if (arquivo) processarImagemPrint(arquivo);
+      if (arquivo) { processarImagemPrint(arquivo); }
     });
 
     window.addEventListener('paste', (e) => {
-      const itens = e.clipboardData?.items;
-      if (!itens) return;
+      const itens = e.clipboardData?.items; if (!itens) return;
       for (const item of itens) {
         if (item.kind === 'file' && item.type.startsWith('image/')) {
-          const arquivo = item.getAsFile();
-          if (arquivo) processarImagemPrint(arquivo);
+          const arquivo = item.getAsFile(); if (arquivo) processarImagemPrint(arquivo);
           break;
         }
       }
     });
 
-    // ---------- ENVIO DE DADOS ----------
     form.addEventListener('submit', async (evento) => {
-      evento.preventDefault();
-      if (!usuarioAtual) return;
-
+      evento.preventDefault(); if (!usuarioAtual) return;
       const empresa = (selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa.value : selectEmpresa.value).trim();
-      const colaborador = inputColaborador.value.trim();
+      const colaborador = inputColaborador.value.trim(); 
+      const visitante = inputVisitante.value.trim();
       const placa = inputPlaca.value.trim().toUpperCase();
-      const veiculo = inputVeiculo.value.trim();
-      const minutos = parseInt(selectTempo.value, 10);
+      const veiculo = inputVeiculo.value.trim(); const minutos = parseInt(selectTempo.value, 10);
 
-      if (!empresa) {
-        mostrarResultado([{ forte: 'Informe a empresa.' }], true);
-        (selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa : selectEmpresa).focus();
-        return;
-      }
-      if (!REGEX_PLACA.test(placa)) {
-        mostrarResultado([{ forte: 'Placa inválida. Use o formato ABC1234 ou ABC1D23.' }], true);
-        inputPlaca.focus();
-        return;
-      }
+      if (!empresa) { mostrarResultado([{ forte: 'Informe a empresa.' }], true); (selectEmpresa.value === 'OUTRA' ? inputOutraEmpresa : selectEmpresa).focus(); return; }
+      if (!REGEX_PLACA.test(placa)) { mostrarResultado([{ forte: 'Placa inválida.' }], true); inputPlaca.focus(); return; }
+      if (ultimoEnvio.placa === placa && Date.now() - ultimoEnvio.em < JANELA_DUPLICADO_MS && !confirm(`A placa ${placa} já foi enviada há poucos minutos. Enviar novamente?`)) return;
 
-      if (ultimoEnvio.placa === placa && Date.now() - ultimoEnvio.em < JANELA_DUPLICADO_MS &&
-          !confirm(`A placa ${placa} já foi enviada há poucos minutos. Enviar novamente?`)) {
-        return;
-      }
-
-      btnEnviar.disabled = true;
-      btnEnviar.textContent = 'Registrando na portaria...';
+      btnEnviar.disabled = true; btnEnviar.textContent = 'Registrando na portaria...';
 
       try {
         await comTimeout(addDoc(collection(db, COLECAO), {
-          empresa,
-          colaborador, // Agora é 100% o nome provado pelo Google
-          placa,
-          veiculo,
-          minutosEstimados: minutos,
-          status: 'AGUARDANDO',
-          criadoEm: serverTimestamp(),
-          expiraEm: Timestamp.fromMillis(Date.now() + DIAS_RETENCAO * 24 * 60 * 60 * 1000),
-          solicitanteUid: usuarioAtual.uid,
-          solicitanteEmail: usuarioAtual.email // Chave mestra de segurança inserida aqui
+          empresa, colaborador, visitante, placa, veiculo, minutosEstimados: minutos, status: 'AGUARDANDO',
+          criadoEm: serverTimestamp(), expiraEm: Timestamp.fromMillis(Date.now() + DIAS_RETENCAO * 24 * 60 * 60 * 1000),
+          solicitanteUid: usuarioAtual.uid, solicitanteEmail: usuarioAtual.email
         }), TIMEOUT_ENVIO_MS);
 
-        ultimoEnvio = { placa, em: Date.now() };
-        armazenamento.gravar('cepan_empresa', empresa); // Só precisa salvar a empresa agora
+        ultimoEnvio = { placa, em: Date.now() }; armazenamento.gravar('cepan_empresa', empresa);
+        const horaFormatada = new Date(Date.now() + minutos * 60000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-        const horaFormatada = new Date(Date.now() + minutos * 60000)
-          .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-        mostrarResultado([
-          { forte: '✓ Enviado para a Portaria!' },
-          { forte: '🚗 Placa: ', texto: veiculo ? `${placa} (${veiculo})` : placa },
-          { forte: '⏱️ Previsão de chegada: ', texto: `às ${horaFormatada} (~${minutos} min)` }
-        ]);
-
-        inputPlaca.value = '';
-        inputVeiculo.value = '';
-        statusOcr.textContent = '';
+        mostrarResultado([ { forte: '✓ Enviado para a Portaria!' }, { forte: '🚗 Placa: ', texto: veiculo ? `${placa} (${veiculo})` : placa }, { forte: '⏱️ Previsão: ', texto: `às ${horaFormatada} (~${minutos} min)` } ]);
+        inputPlaca.value = ''; inputVeiculo.value = ''; inputVisitante.value = ''; statusOcr.textContent = '';
       } catch (erro) {
-        console.error('Erro ao enviar:', erro);
-        let msg = 'Não foi possível enviar. Tente novamente em instantes.';
-        if (erro.code === 'timeout' || erro.code === 'unavailable') {
-          msg = 'Sem resposta do servidor. Verifique sua internet. Se o aviso chegou, a portaria já verá.';
-        } else if (erro.code === 'permission-denied') {
-          msg = 'Os dados foram recusados pelo servidor. Verifique se seu login é válido.';
-        }
+        let msg = 'Erro. Tente novamente.';
+        if (erro.code === 'timeout') msg = 'Internet lenta. Se o aviso chegou, a portaria já verá.';
+        else if (erro.code === 'permission-denied') msg = 'Recusado. Verifique seu login corporativo.';
         mostrarResultado([{ forte: msg }], true);
-      } finally {
-        btnEnviar.disabled = false;
-        btnEnviar.textContent = 'Avisar Portaria';
-      }
+      } finally { btnEnviar.disabled = false; btnEnviar.textContent = 'Avisar Portaria'; }
     });
   </script>
 </body>
