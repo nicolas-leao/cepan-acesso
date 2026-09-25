@@ -22,10 +22,9 @@
     .card-header p { font-size: 0.85rem; color: #64748b; margin-top: 2px; }
     .btn-sair { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-top: 0; width: auto; }
     .btn-sair:hover { background-color: #e2e8f0; color: #1e293b; }
-    .botoes-login { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; margin: 0 auto; }
-    .btn-social { display: inline-flex; align-items: center; justify-content: center; gap: 12px; background-color: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 14px 20px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); width: 100%; }
-    .btn-social:hover:not(:disabled) { background-color: #f8fafc; border-color: #94a3b8; transform: translateY(-2px); }
-    .btn-social:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn-google { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background-color: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 14px 24px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); width: 100%; max-width: 300px; margin: 0 auto; }
+    .btn-google:hover:not(:disabled) { background-color: #f8fafc; border-color: #94a3b8; transform: translateY(-2px); }
+    .btn-google:disabled { opacity: 0.7; cursor: not-allowed; }
     .box-ocr { display: block; background-color: #f8fafc; border: 2px dashed #94a3b8; border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: border-color 0.2s ease, background-color 0.2s ease; -webkit-tap-highlight-color: transparent; }
     .box-ocr:hover, .box-ocr:active, .box-ocr:focus-within { border-color: #2563eb; background-color: #eff6ff; }
     .box-ocr:focus-within { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
@@ -69,8 +68,8 @@
     body.tema-escuro .logo-cepan { filter: none; mix-blend-mode: normal; background-color: #ffffff; padding: 10px 20px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
     body.tema-escuro .resultado { background-color: #064e3b; border-color: #059669; color: #6ee7b7; }
     body.tema-escuro .resultado.erro { background-color: #7f1d1d; border-color: #b91c1c; color: #fca5a5; }
-    body.tema-escuro .btn-social { background-color: #0f172a; border-color: #475569; color: #f1f5f9; }
-    body.tema-escuro .btn-social:hover:not(:disabled) { background-color: #1e293b; }
+    body.tema-escuro .btn-google { background-color: #0f172a; border-color: #475569; color: #f1f5f9; }
+    body.tema-escuro .btn-google:hover:not(:disabled) { background-color: #1e293b; }
     body.tema-escuro .btn-sair { background-color: #0f172a; color: #94a3b8; border-color: #334155; }
     body.tema-escuro .btn-sair:hover { background-color: #ef4444; color: #fff; border-color: #ef4444; }
     @media (min-width: 768px) { body { justify-content: center; padding: 40px 20px; } .card { padding: 32px 28px; } .logo-cepan { max-width: 270px; } .btn-tema { top: 0; } }
@@ -88,20 +87,14 @@
     </header>
 
     <main class="card">
-      <div id="blocoLogin" style="text-align: center; padding: 20px 10px;">
+      <div id="blocoLogin" style="text-align: center; padding: 30px 10px;">
         <h2 style="margin-bottom: 12px; font-size: 1.25rem;">Acesso Corporativo</h2>
         <p style="margin-bottom: 24px; font-size: 0.9rem; color: #64748b;">Faça login com sua conta corporativa para solicitar a liberação do seu veículo na portaria.</p>
         
-        <div class="botoes-login">
-          <button type="button" id="btnGoogle" class="btn-social">
-            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
-            Entrar com Google
-          </button>
-          <button type="button" id="btnMicrosoft" class="btn-social">
-            <svg width="20" height="20" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
-            Entrar com Microsoft
-          </button>
-        </div>
+        <button type="button" id="btnGoogle" class="btn-google">
+          <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+          Entrar com Google
+        </button>
       </div>
 
       <div id="blocoFormulario" style="display: none;">
@@ -127,7 +120,7 @@
             <span class="info-storage" id="avisoSalvo" style="display: none;"></span>
           </div>
 
-          <!-- NOVO CAMPO DE VISITANTE -->
+          <!-- CAMPO DE VISITANTE -->
           <div class="campo">
             <label class="rotulo" for="visitante">Nome do Visitante / Terceiro <span class="opcional">(Preencha se não for você)</span></label>
             <input type="text" id="visitante" placeholder="Ex: Roberto da Manutenção" maxlength="80" />
@@ -186,14 +179,14 @@
   <script type="module" onerror="falhaCarregamento()">
     import { db, auth, COLECAO, REGEX_PLACA } from "./firebase-config.js";
     import { collection, addDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { GoogleAuthProvider, OAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const DIAS_RETENCAO = 90; const TIMEOUT_ENVIO_MS = 15000; const JANELA_DUPLICADO_MS = 3 * 60 * 1000; 
     let ultimoEnvio = { placa: '', em: 0 };
     const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
 
     const blocoLogin = document.getElementById('blocoLogin'); const blocoFormulario = document.getElementById('blocoFormulario');
-    const btnGoogle = document.getElementById('btnGoogle'); const btnMicrosoft = document.getElementById('btnMicrosoft'); const btnSair = document.getElementById('btnSair');
+    const btnGoogle = document.getElementById('btnGoogle'); const btnSair = document.getElementById('btnSair');
     const form = document.getElementById('formAcesso'); const selectEmpresa = document.getElementById('empresa');
     const inputOutraEmpresa = document.getElementById('campoOutraEmpresa'); const inputColaborador = document.getElementById('colaborador');
     const inputVisitante = document.getElementById('visitante');
@@ -219,12 +212,19 @@
     });
 
     let usuarioAtual = null;
-    const googleProvider = new GoogleAuthProvider(); googleProvider.setCustomParameters({ prompt: 'select_account' });
-    const msProvider = new OAuthProvider('microsoft.com'); msProvider.setCustomParameters({ prompt: 'select_account' });
+    const googleProvider = new GoogleAuthProvider(); 
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-    function travarBotoes(conectando) { btnGoogle.disabled = conectando; btnMicrosoft.disabled = conectando; }
-    btnGoogle.addEventListener('click', async () => { try { travarBotoes(true); btnGoogle.innerHTML = 'Conectando...'; await signInWithPopup(auth, googleProvider); } catch (err) { console.error(err); travarBotoes(false); btnGoogle.innerHTML = `Entrar com Google`; }});
-    btnMicrosoft.addEventListener('click', async () => { try { travarBotoes(true); btnMicrosoft.innerHTML = 'Conectando...'; await signInWithPopup(auth, msProvider); } catch (err) { console.error(err); travarBotoes(false); btnMicrosoft.innerHTML = `Entrar com Microsoft`; }});
+    btnGoogle.addEventListener('click', async () => { 
+      try { 
+        btnGoogle.disabled = true; btnGoogle.innerHTML = 'Conectando...'; 
+        await signInWithPopup(auth, googleProvider); 
+      } catch (err) { 
+        console.error(err); btnGoogle.disabled = false; 
+        btnGoogle.innerHTML = `<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg> Entrar com Google`; 
+      }
+    });
+    
     btnSair.addEventListener('click', () => signOut(auth));
 
     onAuthStateChanged(auth, (user) => {
@@ -233,7 +233,7 @@
         inputColaborador.value = user.displayName || user.email.split('@')[0];
         avisoSalvo.style.display = 'block'; avisoSalvo.textContent = `✓ Logado como: ${user.email}`;
       } else {
-        usuarioAtual = null; blocoLogin.style.display = 'block'; blocoFormulario.style.display = 'none'; travarBotoes(false);
+        usuarioAtual = null; blocoLogin.style.display = 'block'; blocoFormulario.style.display = 'none'; btnGoogle.disabled = false;
       }
     });
 
