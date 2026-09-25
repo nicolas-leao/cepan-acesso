@@ -2,18 +2,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function logado() {
-      return request.auth != null;
-    }
+    function logado() { return request.auth != null; }
 
     function ehPorteiro() {
-      return logado()
-        && exists(/databases/$(database)/documents/porteiros/$(request.auth.uid));
+      return logado() && exists(/databases/$(database)/documents/porteiros/$(request.auth.uid));
     }
 
     function ehAdmin() {
-      return ehPorteiro()
-        && get(/databases/$(database)/documents/porteiros/$(request.auth.uid)).data.get('admin', false) == true;
+      return ehPorteiro() && get(/databases/$(database)/documents/porteiros/$(request.auth.uid)).data.get('admin', false) == true;
     }
 
     match /porteiros/{uid} {
@@ -22,14 +18,13 @@ service cloud.firestore {
     }
 
     match /solicitacoes_acesso/{id} {
-
-      // Novo: Exige e valida o e-mail autenticado pelo Google
+      // Aceita o novo campo "visitante" e bloqueia "printUrl"
       allow create: if logado()
         && request.resource.data.keys().hasOnly([
-             'empresa', 'colaborador', 'placa', 'veiculo',
+             'empresa', 'colaborador', 'visitante', 'placa', 'veiculo',
              'minutosEstimados', 'status', 'criadoEm', 'expiraEm', 'solicitanteUid', 'solicitanteEmail'])
         && request.resource.data.keys().hasAll([
-             'empresa', 'colaborador', 'placa', 'veiculo',
+             'empresa', 'colaborador', 'visitante', 'placa', 'veiculo',
              'minutosEstimados', 'status', 'criadoEm', 'expiraEm', 'solicitanteUid', 'solicitanteEmail'])
         && request.resource.data.status == 'AGUARDANDO'
         && request.resource.data.solicitanteUid == request.auth.uid
@@ -43,6 +38,8 @@ service cloud.firestore {
         && request.resource.data.colaborador is string
         && request.resource.data.colaborador.size() >= 2
         && request.resource.data.colaborador.size() <= 80
+        && request.resource.data.visitante is string
+        && request.resource.data.visitante.size() <= 80
         && request.resource.data.veiculo is string
         && request.resource.data.veiculo.size() <= 60
         && request.resource.data.minutosEstimados in [3, 5, 10, 15, 20]
@@ -55,8 +52,7 @@ service cloud.firestore {
       allow update: if ehPorteiro()
         && resource.data.status == 'AGUARDANDO'
         && request.resource.data.status in ['LIBERADO', 'DESCARTADO']
-        && request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['status', 'liberadoEm', 'finalizadoPor'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'liberadoEm', 'finalizadoPor'])
         && request.resource.data.liberadoEm == request.time
         && request.resource.data.finalizadoPor == request.auth.token.email;
 
