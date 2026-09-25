@@ -1,6 +1,3 @@
-// Configuração Firebase compartilhada (formulário e painel da portaria).
-// A apiKey do Firebase é pública por natureza: a proteção real está no
-// firestore.rules + Authentication + App Check.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -15,9 +12,6 @@ const firebaseConfig = {
   appId: "1:179404408385:web:6afff01f3b82ca6f2668c0"
 };
 
-// Chave de site do reCAPTCHA v3 para o App Check.
-// Deixe vazia até configurar em Console Firebase > App Check.
-// Depois de colar a chave e verificar que funciona, ative o "Enforce" do Firestore.
 const RECAPTCHA_V3_SITE_KEY = "";
 
 export const app = initializeApp(firebaseConfig);
